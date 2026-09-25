@@ -22,8 +22,8 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "homepage": "https://github.com/yashwant-das/llm-promptfoo-tests",
+  "homepage": "https://github.com/yashwant-das/ai-js-promptfoo-eval",
   "bugs": {
-    "url": "https://github.com/yashwant-das/llm-promptfoo-tests/issues"
+    "url": "https://github.com/yashwant-das/ai-js-promptfoo-eval/issues"
   }
 }
