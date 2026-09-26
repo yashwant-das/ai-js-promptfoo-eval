@@ -27,10 +27,12 @@ providers:
     label: Gemini 2.5 Flash
     config:
       temperature: 0.3
-  - id: ollama:gpt-oss:20b
-    label: GPT-OSS 20B
+  # think: false keeps the model's reasoning out of the translation
+  - id: ollama:chat:qwen3.8:27b-mlx
+    label: Qwen 3.8 27B
     config:
       temperature: 0.3
+      think: false
 
 # ── Prompts ────────────────────────────────────────────────────────
 prompts:

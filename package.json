@@ -1,12 +1,14 @@
 {
   "name": "promptfoo-eval",
   "version": "1.0.0",
-  "description": "Professional LLM evaluation suite with multi-model comparison",
+  "description": "Evaluates LLM output with promptfoo and local models: translation quality and test cases written from user stories",
   "private": true,
   "scripts": {
     "eval": "promptfoo eval",
     "eval:full": "promptfoo eval -c promptfooconfig.full.yaml",
+    "eval:test-design": "promptfoo eval -c promptfooconfig.test-design.yaml",
     "eval:watch": "promptfoo eval -w",
+    "test": "node --test \"tests/test-design/*.test.js\"",
     "publish": "promptfoo publish",
     "report": "promptfoo view",
     "compare": "promptfoo eval --diff"
@@ -17,13 +19,18 @@
     "evaluation",
     "testing",
     "translation",
-    "ai"
+    "ai",
+    "test-design",
+    "user-stories"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.22.0"
   },
   "homepage": "https://github.com/yashwant-das/ai-js-promptfoo-eval",
   "bugs": {
     "url": "https://github.com/yashwant-das/ai-js-promptfoo-eval/issues"
+  },
+  "devDependencies": {
+    "promptfoo": "^0.123.1"
   }
 }

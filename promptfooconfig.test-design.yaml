@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+description: 'Test Design Evaluation — test cases written from user stories'
+
+# ── Providers (local, via Ollama) ───────────────────────────────────
+# think: false keeps the models' reasoning out of the answer, which must be pure JSON.
+providers:
+  - id: ollama:chat:qwen3.8:27b-mlx
+    label: Qwen 3.8 27B
+    config:
+      temperature: 0.2
+      think: false
+  - id: ollama:chat:qwen3.6:35b-mlx
+    label: Qwen 3.6 35B
+    config:
+      temperature: 0.2
+      think: false
+
+# ── Prompts ────────────────────────────────────────────────────────
+prompts:
+  - id: file://prompts/test-design/basic.txt
+    label: Basic
+  - id: file://prompts/test-design/techniques.txt
+    label: Test design techniques
+
+# ── Tests ──────────────────────────────────────────────────────────
+tests: file://tests/test-design/stories.yaml
+
+# ── Scoring ────────────────────────────────────────────────────────
+# Code checks run on every output; each story adds must-have checks graded by a model.
+defaultTest:
+  options:
+    provider:
+      id: ollama:chat:qwen3.8:27b-mlx
+      config:
+        temperature: 0
+        think: false
+  assert:
+    - type: javascript
+      value: file://tests/test-design/checks.js:validStructure
+      metric: structure
+    - type: javascript
+      value: file://tests/test-design/checks.js:coversAllCriteria
+      metric: coverage
+    - type: javascript
+      value: file://tests/test-design/checks.js:includesNegative
+      metric: negative-tests
+    - type: javascript
+      value: file://tests/test-design/checks.js:includesBoundary
+      metric: boundary-tests
+    - type: javascript
+      value: file://tests/test-design/checks.js:specificExpectedResults
+      metric: specific-results
+    - type: javascript
+      value: file://tests/test-design/checks.js:noDuplicateTitles
+      metric: no-duplicates
+
+# Ollama answers one request per model at a time; more parallel requests only queue and time out.
+evaluateOptions:
+  maxConcurrency: 2
+
+# ── Output ─────────────────────────────────────────────────────────
+outputPath:
+  - outputs/test-design-results.json
+  - outputs/test-design-results.csv

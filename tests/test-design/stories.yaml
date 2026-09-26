@@ -1,0 +1,123 @@
+# User stories for the test-design suite.
+# vars.ac_ids and vars.has_limits drive the code checks in checks.js. ac_ids is a comma-separated
+# string, not a list: promptfoo runs a test once per value of a list variable.
+# Each llm-rubric is one test an experienced QA engineer would expect to see.
+
+- description: Account lockout
+  vars:
+    story: As a registered user, I want my account locked after repeated failed logins, so that nobody can guess my password.
+    criteria: |
+      AC1: After 5 consecutive failed login attempts, the account is locked.
+      AC2: A successful login resets the failed-attempt counter to zero.
+      AC3: While locked, login is refused even with the correct password, and the message "Account locked. Try again in 30 minutes." is shown.
+      AC4: The lock is removed automatically 30 minutes after it was applied.
+    ac_ids: "AC1, AC2, AC3, AC4"
+    has_limits: true
+  assert:
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a boundary test showing that 4 consecutive failed attempts do NOT lock the account and the 5th does.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test where failed attempts are followed by a successful login, and further failures then start counting from zero again (for example 4 failures, a success, then 4 more failures leave the account unlocked).
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that a locked account refuses the correct password and shows "Account locked. Try again in 30 minutes."
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test around the 30-minute unlock, checking that login is still refused before 30 minutes have passed and allowed after.
+
+- description: Password reset link
+  vars:
+    story: As a user who forgot my password, I want to reset it with an emailed link, so that I can get back into my account.
+    criteria: |
+      AC1: Submitting an email address sends a reset link to that address if an account exists.
+      AC2: The page shows the same confirmation message whether or not an account exists for the email.
+      AC3: A reset link expires 24 hours after it is sent.
+      AC4: A reset link can be used only once.
+      AC5: The new password must be at least 12 characters long.
+    ac_ids: "AC1, AC2, AC3, AC4, AC5"
+    has_limits: true
+  assert:
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that an email address with no account gets exactly the same confirmation message as a registered one, so the page does not reveal which accounts exist.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that a reset link used after 24 hours is rejected.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that a reset link cannot be used a second time after a successful reset.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a boundary test on password length, where 11 characters is rejected and 12 characters is accepted.
+
+- description: Discount code at checkout
+  vars:
+    story: As a shopper, I want to apply a discount code at checkout, so that I pay less on qualifying orders.
+    criteria: |
+      AC1: The code SAVE10 gives 10% off the order subtotal.
+      AC2: The code applies only when the subtotal is $50.00 or more.
+      AC3: Only one discount code can be applied per order.
+      AC4: Codes are not case-sensitive.
+      AC5: An expired code is rejected with the message "This code has expired."
+    ac_ids: "AC1, AC2, AC3, AC4, AC5"
+    has_limits: true
+  assert:
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a boundary test at the $50.00 threshold, where a subtotal of $49.99 is refused and $50.00 is accepted.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that a second discount code is refused when one is already applied.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that a lower-case or mixed-case version of the code (for example "save10") is accepted.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that states a subtotal and checks the exact total after the 10% discount. Any qualifying subtotal counts; $80.00 becoming $72.00 is only an illustration.
+
+- description: Document upload
+  vars:
+    story: As a customer, I want to upload supporting documents to my claim, so that the claims team can review them.
+    criteria: |
+      AC1: PDF, PNG and JPG files are accepted.
+      AC2: Files larger than 10 MB are rejected with the message "File exceeds 10 MB."
+      AC3: Other file types are rejected with the message "Unsupported file type."
+      AC4: Up to 5 files can be attached to one claim.
+    ac_ids: "AC1, AC2, AC3, AC4"
+    has_limits: true
+  assert:
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a boundary test on file size, where a file of exactly 10 MB is accepted and one just over 10 MB is rejected with "File exceeds 10 MB."
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that an unsupported type (for example .exe or .docx) is rejected with "Unsupported file type."
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a boundary test on the file count, where a 5th file is accepted and a 6th is refused.
+
+- description: Transfer between own accounts
+  vars:
+    story: As a bank customer, I want to move money between my own accounts, so that I can manage my balances.
+    criteria: |
+      AC1: The amount must be greater than zero and have at most two decimal places.
+      AC2: The amount cannot exceed the available balance of the source account.
+      AC3: Transfers are limited to $5,000.00 per day in total, across all transfers.
+      AC4: After a successful transfer, both account balances are updated immediately.
+    ac_ids: "AC1, AC2, AC3, AC4"
+    has_limits: true
+  assert:
+    - type: llm-rubric
+      metric: must-have
+      value: Includes tests that reject a zero or negative amount, and an amount with three decimal places (for example 10.005).
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that an amount greater than the available balance is rejected, ideally with a boundary check at exactly the available balance.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test where a transfer is refused because, together with earlier transfers the same day, it would exceed $5,000.00. The earlier transfers can be performed in the steps or set up in the preconditions, and any amounts count; $4,000.00 then $1,000.00 allowed and a further $0.01 refused is only an illustration.
+    - type: llm-rubric
+      metric: must-have
+      value: Includes a test that checks both the source and destination balances change by the transferred amount.

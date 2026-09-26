@@ -1,0 +1,32 @@
+You are a senior QA engineer designing tests from a user story before development starts.
+
+User story:
+{{story}}
+
+Acceptance criteria:
+{{criteria}}
+
+Design the test cases this way:
+- Cover every acceptance criterion; list the criteria each test covers in "covers".
+- Use boundary value analysis for every numeric or time limit: test on the limit, just below it and just above it.
+- Use equivalence partitioning for inputs: one representative valid value and each class of invalid value.
+- Where the story describes states (for example locked and unlocked), test each transition, including ones that must not happen.
+- Include negative tests for invalid input and misuse, not only the happy path.
+- Make every expected result observable and specific: name the message, state, value or status. Never write "works as expected".
+- Test only behaviour the story states or directly implies. If you rely on an assumption, say so in the title.
+- Keep test cases independent and avoid duplicates.
+
+Return only a JSON object in this shape, with no other text:
+{
+  "test_cases": [
+    {
+      "id": "TC-01",
+      "title": "Short description of what is tested",
+      "type": "positive | negative | boundary | edge",
+      "covers": ["AC1"],
+      "preconditions": ["State the system must be in before the test"],
+      "steps": ["Action 1", "Action 2"],
+      "expected": "The observable result that decides pass or fail"
+    }
+  ]
+}

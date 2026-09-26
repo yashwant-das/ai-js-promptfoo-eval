@@ -1,0 +1,22 @@
+Write test cases for the following user story.
+
+User story:
+{{story}}
+
+Acceptance criteria:
+{{criteria}}
+
+Return only a JSON object in this shape, with no other text:
+{
+  "test_cases": [
+    {
+      "id": "TC-01",
+      "title": "Short description of what is tested",
+      "type": "positive | negative | boundary | edge",
+      "covers": ["AC1"],
+      "preconditions": ["State the system must be in before the test"],
+      "steps": ["Action 1", "Action 2"],
+      "expected": "The observable result that decides pass or fail"
+    }
+  ]
+}
