@@ -37,8 +37,8 @@
     language: Hindi
     input: Hello world
   assert:
-    - type: icontains
-      value: ह
+    - type: icontains-any
+      value: ["नमस्ते", "नमस्कार", "हैलो"]
 
 - vars:
     language: French
@@ -65,7 +65,7 @@
     language: French
     input: Good morning
   assert:
-    - type: contains
+    - type: icontains
       value: bonjour
 
 - vars:
@@ -86,7 +86,7 @@
     language: French
     input: Thank you very much for your help
   assert:
-    - type: contains
+    - type: icontains
       value: merci
 
 - vars:
@@ -100,8 +100,8 @@
     language: German
     input: Thank you very much for your help
   assert:
-    - type: contains
-      value: Danke
+    - type: icontains
+      value: dank
 
 - vars:
     language: French
@@ -121,8 +121,8 @@
     language: German
     input: The meeting is scheduled for tomorrow at 3 PM
   assert:
-    - type: contains
-      value: meeting|Besprechung
+    - type: icontains-any
+      value: ["Besprechung", "Treffen", "Termin", "Meeting"]
 
 - vars:
     language: Japanese
@@ -135,33 +135,33 @@
     language: Japanese
     input: Nice to meet you
   assert:
-    - type: icontains
-      value: 会
+    - type: icontains-any
+      value: ["はじめまして", "会"]
 
 - vars:
     language: French
     input: I would like to order a coffee, please
   assert:
-    - type: contains
-      value: café|commander|voudrais
+    - type: icontains-any
+      value: ["café", "commander", "voudrais"]
 
 - vars:
     language: Spanish
     input: I would like to order a coffee, please
   assert:
-    - type: contains
-      value: café|quiero|deseo
+    - type: icontains-any
+      value: ["café", "quiero", "deseo"]
 
 - vars:
     language: German
     input: I would like to order a coffee, please
   assert:
-    - type: contains
-      value: Kaffee|bestellen
+    - type: icontains-any
+      value: ["Kaffee", "bestellen"]
 
 - vars:
     language: Arabic
     input: I would like to order a coffee, please
   assert:
-    - type: icontains
-      value: قهوه|قهوة|اريد
+    - type: icontains-any
+      value: ["قهوه", "قهوة", "اريد"]

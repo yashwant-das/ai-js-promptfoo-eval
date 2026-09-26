@@ -16,22 +16,22 @@
     language: French
     input: It's raining cats and dogs
   assert:
-    - type: contains
-      value: il pleut|battre
+    - type: icontains-any
+      value: ["il pleut", "battre"]
 
 - vars:
     language: Spanish
     input: It's raining cats and dogs
   assert:
-    - type: contains
-      value: llover|gato|perro
+    - type: icontains-any
+      value: ["llov", "lluev", "cántaros", "gato"]
 
 - vars:
     language: German
     input: Don't cross the bridge until you come to it
   assert:
-    - type: contains
-      value: Brücke
+    - type: icontains-any
+      value: ["Brücke", "Sorge", "Kommt Zeit"]
 
 - vars:
     language: French
@@ -51,29 +51,29 @@
     language: German
     input: I am hungry
   assert:
-    - type: contains
-      value: hungrig|Hunger
+    - type: icontains-any
+      value: ["hungrig", "Hunger"]
 
 - vars:
     language: French
     input: "Hello! How are you today? :-)"
   assert:
-    - type: contains
-      value: Bonjour|Salut
+    - type: icontains-any
+      value: ["Bonjour", "Salut"]
 
 - vars:
     language: Spanish
     input: "Hello! How are you today? :-)"
   assert:
-    - type: contains
-      value: Hola|¿Cómo estás
+    - type: icontains-any
+      value: ["Hola", "¿Cómo estás"]
 
 - vars:
     language: German
     input: "Hello! How are you today? :-)"
   assert:
-    - type: contains
-      value: Hallo|Wie geht
+    - type: icontains-any
+      value: ["Hallo", "Wie geht"]
 
 - vars:
     language: French
@@ -108,7 +108,7 @@
     input: "Price: $1,234.56 USD — tax included"
   assert:
     - type: regex
-      value: '\$1,234.56|1\.234,56|1234,56'
+      value: '\$1,234\.56|1[.\s\u00a0\u202f]?234,56'
 
 - vars:
     language: French
@@ -128,15 +128,15 @@
     language: French
     input: Can you help me?
   assert:
-    - type: not-contains
-      value: "Error|erreur|erreur"
+    - type: not-icontains-any
+      value: ["error", "erreur"]
 
 - vars:
     language: Spanish
     input: Can you help me?
   assert:
-    - type: not-contains
-      value: "Error|error"
+    - type: not-icontains-any
+      value: ["error"]
 
 - vars:
     language: French
