@@ -1,6 +1,7 @@
 {
   "name": "promptfoo-eval",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Evaluates LLM output with promptfoo and local models: translation quality and test cases written from user stories",
   "private": true,
   "scripts": {
