@@ -1,11 +1,38 @@
 # ai-js-promptfoo-eval
 
-Evaluates LLM output with [Promptfoo](https://www.promptfoo.dev) and local models through [Ollama](https://ollama.com). No API keys needed. Two suites:
+Evaluates LLM output with [Promptfoo](https://www.promptfoo.dev) and local models through [Ollama](https://ollama.com): test cases a model writes from user stories, and translation quality. No API keys needed.
 
-- **Test design**: a model writes test cases from a user story, and the suite grades them the way a QA lead would review them.
+[![Tests](https://github.com/yashwant-das/ai-js-promptfoo-eval/actions/workflows/tests.yml/badge.svg)](https://github.com/yashwant-das/ai-js-promptfoo-eval/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Promptfoo](https://img.shields.io/badge/Promptfoo-0.123-4B32C3)](https://www.promptfoo.dev)
+[![Ollama](https://img.shields.io/badge/Ollama-local-000000?logo=ollama&logoColor=white)](https://ollama.com)
+[![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+
+## Why it exists
+
+"The model writes good test cases" is a claim that needs evidence. This repo grades model output the way a QA lead would: deterministic code checks set a floor, and a grader model checks each story for the specific tests an experienced engineer would expect. Two suites:
+
+- **Test design**: a model writes test cases from a user story, and the suite grades them.
 - **Translation**: translation quality across prompts, including idioms, code, numbers and scripts.
 
-## Prerequisites
+## Architecture
+
+```mermaid
+flowchart LR
+    Stories[User stories and<br/>acceptance criteria] --> PF[Promptfoo]
+    Prompts[Prompts] --> PF
+    PF -->|generate| Model[Local model<br/>via Ollama]
+    Model -->|JSON test cases| Checks[Code checks<br/>checks.js]
+    Model -->|JSON test cases| Grader[Grader model<br/>must-have tests]
+    Checks --> Report[Promptfoo report<br/>and outputs/]
+    Grader --> Report
+```
+
+Each model output goes through both layers: code checks with no model involved, then a grader model that looks for each must-have test separately.
+
+## Quickstart
+
+Prerequisites:
 
 - [Node.js](https://nodejs.org) 22.22 or later
 - [Ollama](https://ollama.com) running locally with the tested models pulled:
@@ -17,16 +44,44 @@ Evaluates LLM output with [Promptfoo](https://www.promptfoo.dev) and local model
 
 The `-mlx` builds run on Apple Silicon. On other machines, use the standard Qwen tags and update the provider ids in the configs.
 
-## Quick start
-
 ```bash
+git clone https://github.com/yashwant-das/ai-js-promptfoo-eval.git && cd ai-js-promptfoo-eval
 npm install                  # installs promptfoo locally
+npm test                     # unit tests for the code checks, no model needed
 npm run eval:test-design     # test-design suite
 npm run eval                 # translation suite
 npm run report               # open the results in your browser
 ```
 
-## Test design suite
+## Test reports and results
+
+- CI runs the unit tests for the code checks on every push and pull request. The evaluations need local models, so they run on a developer machine, not in CI.
+- `npm run report` opens the Promptfoo viewer for the latest run; results are also written to `outputs/`. `npm run publish` shares a run to the Promptfoo web dashboard.
+
+### Test design suite results (2026-09-26, Apple M4 Max, 64 GB)
+
+| Model | Prompt | All checks pass | Must-haves found | Tests per story | Time per story |
+|---|---|---|---|---|---|
+| Qwen 3.8 27B | Basic | 3/5 | 17/19 | 8.0 | 31 s |
+| Qwen 3.8 27B | Test design techniques | 4/5 | 18/19 | 12.2 | 39 s |
+| Qwen 3.6 35B | Basic | 1/5 | 13/19 | 6.6 | 28 s |
+| Qwen 3.6 35B | Test design techniques | 4/5 | 18/19 | 10.0 | 35 s |
+
+- Every output passed the structure, coverage, specific-results and duplicate checks. The code checks set a floor; the must-haves separate the results.
+- Naming test design techniques in the prompt helped most on Qwen 3.6: must-haves found rose from 13 to 18, and boundary tests appeared for every story.
+- The most-missed must-have was the lockout counter reset: failures, then a success, then failures again. Three of four outputs tested the reset but never checked the counting that follows.
+
+Writing must-haves: the grader tends to read example values literally. State the behaviour and mark any values as an illustration, as the stories file does.
+
+**Grader bias:** by default `qwen3.8:27b-mlx` also grades, so it grades its own output. To use a different grader, change `defaultTest.options.provider` in [`promptfooconfig.test-design.yaml`](promptfooconfig.test-design.yaml).
+
+### Translation suite results
+
+On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both from the Detailed prompt: "ハローワールド" instead of "こんにちは世界" for "Hello world", and "Salut !" for "What's up?".
+
+## How the suites work
+
+### Test design suite
 
 A model reads a user story and its acceptance criteria, and returns test cases as JSON: title, type (positive, negative, boundary, edge), the criteria each test covers, preconditions, steps and expected result. Each output is graded in two layers.
 
@@ -47,28 +102,22 @@ The five stories cover account lockout, password reset, a discount code, documen
 
 `npm test` runs unit tests for the code checks. They need no model and run in CI.
 
-### Results (2026-09-26, Apple M4 Max, 64 GB)
-
-| Model | Prompt | All checks pass | Must-haves found | Tests per story | Time per story |
-|---|---|---|---|---|---|
-| Qwen 3.8 27B | Basic | 3/5 | 17/19 | 8.0 | 31 s |
-| Qwen 3.8 27B | Test design techniques | 4/5 | 18/19 | 12.2 | 39 s |
-| Qwen 3.6 35B | Basic | 1/5 | 13/19 | 6.6 | 28 s |
-| Qwen 3.6 35B | Test design techniques | 4/5 | 18/19 | 10.0 | 35 s |
-
-- Every output passed the structure, coverage, specific-results and duplicate checks. The code checks set a floor; the must-haves separate the results.
-- Naming test design techniques in the prompt helped most on Qwen 3.6: must-haves found rose from 13 to 18, and boundary tests appeared for every story.
-- The most-missed must-have was the lockout counter reset: failures, then a success, then failures again. Three of four outputs tested the reset but never checked the counting that follows.
-
-Writing must-haves: the grader tends to read example values literally. State the behaviour and mark any values as an illustration, as the stories file does.
-
-**Grader bias:** by default `qwen3.8:27b-mlx` also grades, so it grades its own output. To use a different grader, change `defaultTest.options.provider` in [`promptfooconfig.test-design.yaml`](promptfooconfig.test-design.yaml).
-
-## Translation suite
+### Translation suite
 
 Translates short English texts into other languages with three prompts (direct, detailed, and code-aware) and checks the results: 24 standard tests, and 21 edge cases covering idioms, special characters, code, numbers and currency, and script preservation. Results are saved to `outputs/results.json` and `outputs/results-latest.csv`.
 
-On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both from the Detailed prompt: "ハローワールド" instead of "こんにちは世界" for "Hello world", and "Salut !" for "What's up?".
+Every local provider sets `think: false`. Qwen models otherwise prefix their answer with their reasoning, which breaks JSON parsing and the translation checks.
+
+Cloud providers, and how to add providers, prompts and tests: [docs/customizing.md](docs/customizing.md).
+
+## Tech stack
+
+| Layer | Tool | Version | Why |
+| --- | --- | --- | --- |
+| Evaluation | Promptfoo | 0.123 | Declarative configs, model-graded assertions and a results viewer |
+| Models | Ollama with Qwen 3.8 27B and Qwen 3.6 35B | local | No API keys or per-token cost; runs on Apple Silicon |
+| Code checks | Node.js test runner | 22 | Unit tests for the checks with no extra dependencies |
+| Optional cloud providers | OpenAI, Anthropic, Google | see docs | Comparison against hosted models |
 
 ## Project structure
 
@@ -84,6 +133,7 @@ On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both f
 | `tests/translations.yaml`, `tests/edge_cases.yaml` | Translation tests |
 | `outputs/` | Evaluation results (git-ignored) |
 | `.env.example` | API key template for cloud providers |
+| `docs/customizing.md` | Cloud providers, adding providers, prompts and tests |
 
 ## Commands
 
@@ -97,91 +147,6 @@ On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both f
 | `npm run report` | View results locally |
 | `npm run publish` | Publish results to the promptfoo web dashboard |
 | `npm run compare` | Compare two evaluation runs |
-
-## Configuration
-
-Every local provider sets `think: false`. Qwen models otherwise prefix their answer with their reasoning, which breaks JSON parsing and the translation checks.
-
-### Full configuration
-
-To compare against cloud providers, copy the env template and add your API keys:
-
-```bash
-cp .env.example .env
-# Edit .env with your keys
-npm run eval:full
-```
-
-| Provider | Model ID | Temp | API Key |
-|---|---|---|---|
-| OpenAI | `gpt-4.1-mini` | 0.3 | `OPENAI_API_KEY` |
-| OpenAI | `gpt-4o` | 0.3 | `OPENAI_API_KEY` |
-| OpenAI | `o3-mini` | 0.3 | `OPENAI_API_KEY` |
-| Anthropic | `claude-sonnet-4-20250514` | 0.3 | `ANTHROPIC_API_KEY` |
-| Google | `gemini-2.5-flash` | 0.3 | `GOOGLE_API_KEY` |
-
-### Tests
-
-- `tests/translations.yaml` — Standard translations: greetings, questions, requests, formal language, idioms
-- `tests/edge_cases.yaml` — Edge cases: idioms, special characters, code snippets, numbers/currency, script preservation, negative assertions
-
-## Customizing
-
-### Adding a Provider
-
-Add to `providers` in `promptfooconfig.yaml` (or `promptfooconfig.full.yaml`):
-
-```yaml
-- id: openai:gpt-3.5-turbo
-  label: GPT-3.5 Turbo
-  config:
-    temperature: 0.3
-```
-
-For cloud providers, add the corresponding API key to `.env`.
-
-### Adding a Test
-
-#### Translation test (append to `tests/translations.yaml`)
-
-```yaml
-- vars:
-    language: Portuguese
-    input: Good evening
-  assert:
-    - type: contains
-      value: boa noite
-```
-
-#### Edge-case test (append to `tests/edge_cases.yaml`)
-
-```yaml
-- vars:
-    language: French
-    input: The path is C:\Users\foo\bar.txt
-  assert:
-    - type: regex
-      value: "C:\\\\Users\\\\foo\\\\bar\\.txt"
-```
-
-### Adding a Prompt
-
-1. Create `prompts/new_strategy.txt`
-2. Add to `prompts` in your config file:
-
-```yaml
-prompts:
-  - id: file://prompts/new_strategy.txt
-    label: New Strategy
-```
-
-## Notes
-
-- Use `similar` or `regex` assertions for non-English scripts
-- Use `temperature` of 0.1–0.3 for evaluation consistency
-- Use full model IDs (e.g., `claude-sonnet-4-20250514`) rather than aliases
-- Commit test files, not results in `outputs/`
-- Review results before merging provider or prompt changes
 
 ## License
 
