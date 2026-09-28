@@ -8,11 +8,14 @@
     "eval": "promptfoo eval",
     "eval:full": "promptfoo eval -c promptfooconfig.full.yaml",
     "eval:test-design": "promptfoo eval -c promptfooconfig.test-design.yaml",
+    "eval:ci:translation": "promptfoo eval -c ci/promptfooconfig.translation.yaml -o outputs/ci/translation.json",
+    "eval:ci:test-design": "promptfoo eval -c ci/promptfooconfig.test-design.yaml -o outputs/ci/test-design.json",
     "eval:watch": "promptfoo eval -w",
-    "test": "node --test \"tests/test-design/*.test.js\"",
+    "test": "node --test \"tests/test-design/*.test.js\" \"scripts/*.test.js\"",
     "publish": "promptfoo publish",
     "report": "promptfoo view",
-    "compare": "promptfoo eval --diff"
+    "compare": "node scripts/compare.js",
+    "baseline": "node scripts/baseline.js"
   },
   "keywords": [
     "promptfoo",
@@ -32,6 +35,7 @@
     "url": "https://github.com/yashwant-das/ai-js-promptfoo-eval/issues"
   },
   "devDependencies": {
+    "js-yaml": "^5.4.2",
     "promptfoo": "^0.123.1"
   }
 }

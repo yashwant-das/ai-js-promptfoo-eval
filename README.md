@@ -45,7 +45,7 @@ A model reads a user story and its acceptance criteria, and returns test cases a
 
 The five stories cover account lockout, password reset, a discount code, document upload and bank transfers. Two prompts are compared: a plain request, and one that asks for named test design techniques (boundary value analysis, equivalence partitioning, state transitions).
 
-`npm test` runs unit tests for the code checks. They need no model and run in CI.
+`npm test` runs unit tests for the code checks and the baseline scripts. They need no model and run in CI.
 
 ### Results (2026-09-26, Apple M4 Max, 64 GB)
 
@@ -70,6 +70,29 @@ Translates short English texts into other languages with three prompts (direct, 
 
 On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both from the Detailed prompt: "ハローワールド" instead of "こんにちは世界" for "Hello world", and "Salut !" for "What's up?".
 
+## CI evals and baselines
+
+Every pull request that changes a prompt, a test, a config or the scoring runs both suites in CI ([`.github/workflows/eval.yml`](.github/workflows/eval.yml)) and fails if a score drops below the committed baseline.
+
+The runners have no GPU, so CI uses `qwen3:4b` on the CPU with temperature 0 and a fixed seed ([`ci/`](ci/)). It runs the translation suite in full, and the test-design suite with the techniques prompt and the code checks only: a 4B model is too weak a grader for the must-haves to be worth gating on. The CI tier catches prompt and scoring regressions, not the model quality the results above describe.
+
+The baselines in [`baselines/`](baselines/) record the pass rate and each metric per model and prompt. A run fails when any of them falls more than the file's `tolerance` below the recorded value, or when a recorded run or metric is missing. The job summary shows the comparison, and the raw results are uploaded as an artifact.
+
+When a change is meant to move a score, update the baseline in the same pull request, so the new numbers are reviewed with the change:
+
+```bash
+npm run eval:ci:translation      # needs: ollama pull qwen3:4b
+npm run baseline -- update outputs/ci/translation.json baselines/ci-translation.json
+```
+
+or copy the proposed baseline from the failing job's summary. The same commands work on the full suites, for example `npm run baseline -- check outputs/test-design-results.json baselines/local-test-design.json` after recording a local baseline.
+
+To see what changed between two runs, test by test:
+
+```bash
+npm run compare -- outputs/before.json outputs/results.json
+```
+
 ## Project structure
 
 | File | Description |
@@ -78,6 +101,9 @@ On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both f
 | `prompts/test-design/` | Basic and test-design-techniques prompts |
 | `tests/test-design/stories.yaml` | User stories, acceptance criteria and must-have tests |
 | `tests/test-design/checks.js` | Code checks, with unit tests in `checks.test.js` |
+| `ci/` | CI tier of both suites on a small model |
+| `baselines/` | Committed scores that CI compares each run with |
+| `scripts/` | Baseline check and run comparison |
 | `promptfooconfig.yaml` | Translation suite, local model |
 | `promptfooconfig.full.yaml` | Translation suite with OpenAI, Anthropic and Google added |
 | `prompts/direct.txt`, `detailed.txt`, `code_mixing.txt` | Translation prompts |
@@ -92,11 +118,13 @@ On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both f
 | `npm run eval:test-design` | Test-design suite on the local models |
 | `npm run eval` | Translation suite on the local model |
 | `npm run eval:full` | Translation suite with cloud providers (needs API keys) |
-| `npm test` | Unit tests for the test-design code checks |
+| `npm test` | Unit tests for the code checks and the baseline scripts |
 | `npm run eval:watch` | Re-run the translation suite on file changes |
 | `npm run report` | View results locally |
 | `npm run publish` | Publish results to the promptfoo web dashboard |
-| `npm run compare` | Compare two evaluation runs |
+| `npm run compare -- <before.json> <after.json>` | Compare two saved runs, score by score and test by test |
+| `npm run eval:ci:translation`, `eval:ci:test-design` | CI tier of each suite on `qwen3:4b` |
+| `npm run baseline -- check\|update <results.json> <baseline.json>` | Check a run against a baseline, or record one |
 
 ## Configuration
 

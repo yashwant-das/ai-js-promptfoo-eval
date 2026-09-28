@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# CI tier of the translation suite: the same prompts and tests on a small model that runs on a
+# GitHub runner's CPU. The score is compared with baselines/ci-translation.json, not held to 100%.
+description: 'Translation Evaluation — CI (small local model)'
+
+providers:
+  - id: ollama:chat:qwen3:4b
+    label: Qwen 3 4B
+    config:
+      temperature: 0
+      seed: 42
+      think: false
+      num_predict: 256
+
+prompts:
+  - id: file://../prompts/direct.txt
+    label: Direct (default)
+  - id: file://../prompts/detailed.txt
+    label: Detailed
+  - id: file://../prompts/code_mixing.txt
+    label: Code-Aware
+
+tests:
+  - file://../tests/translations.yaml
+  - file://../tests/edge_cases.yaml
+
+defaultTest:
+  assert:
+    - type: javascript
+      value: "return output.length > 0 && output.trim() !== ''"
+      weight: 0
+      threshold: 1
+
+# A CPU runner answers one request at a time; more parallel requests only queue.
+evaluateOptions:
+  maxConcurrency: 2

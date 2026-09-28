@@ -1,0 +1,93 @@
+name: Evals
+
+# Runs both suites on a small model on the runner's CPU and fails when a score falls below the
+# committed baseline in baselines/. Runs only when something that can change a score changes.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'prompts/**'
+      - 'tests/**'
+      - 'ci/**'
+      - 'scripts/**'
+      - 'baselines/**'
+      - 'promptfooconfig*.yaml'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/eval.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'prompts/**'
+      - 'tests/**'
+      - 'ci/**'
+      - 'scripts/**'
+      - 'baselines/**'
+      - 'promptfooconfig*.yaml'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/eval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI_MODEL: qwen3:4b
+  OLLAMA_MODELS: ${{ github.workspace }}/.ollama/models
+  PROMPTFOO_DISABLE_TELEMETRY: '1'
+  PROMPTFOO_DISABLE_UPDATE: '1'
+  # Failing tests are expected on a small model; the baseline check decides pass or fail.
+  PROMPTFOO_FAILED_TEST_EXIT_CODE: '0'
+
+jobs:
+  eval:
+    name: Eval (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [translation, test-design]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Cache the model
+        uses: actions/cache@v4
+        with:
+          path: .ollama/models
+          key: ollama-${{ env.CI_MODEL }}
+
+      - name: Start Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          # The installer starts a system service with its own model directory; run our own
+          # server instead so the cached models are used.
+          sudo systemctl stop ollama || true
+          nohup ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:11434/api/version && break; sleep 1; done
+          ollama --version
+          ollama pull "$CI_MODEL"
+
+      - name: Run the ${{ matrix.suite }} suite
+        run: npx promptfoo eval -c ci/promptfooconfig.${{ matrix.suite }}.yaml -o outputs/ci/${{ matrix.suite }}.json --no-table --no-share
+
+      - name: Compare with the baseline
+        run: node scripts/baseline.js check outputs/ci/${{ matrix.suite }}.json baselines/ci-${{ matrix.suite }}.json
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-${{ matrix.suite }}
+          path: outputs/ci/
+          if-no-files-found: ignore
