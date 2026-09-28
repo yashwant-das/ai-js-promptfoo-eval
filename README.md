@@ -100,7 +100,7 @@ A model reads a user story and its acceptance criteria, and returns test cases a
 
 The five stories cover account lockout, password reset, a discount code, document upload and bank transfers. Two prompts are compared: a plain request, and one that asks for named test design techniques (boundary value analysis, equivalence partitioning, state transitions).
 
-`npm test` runs unit tests for the code checks. They need no model and run in CI.
+`npm test` runs unit tests for the code checks and the baseline scripts. They need no model and run in CI.
 
 ### Translation suite
 
@@ -119,6 +119,30 @@ Cloud providers, and how to add providers, prompts and tests: [docs/customizing.
 | Code checks | Node.js test runner | 22 | Unit tests for the checks with no extra dependencies |
 | Optional cloud providers | OpenAI, Anthropic, Google | see docs | Comparison against hosted models |
 
+## CI evals and baselines
+
+Every pull request that changes a prompt, a test, a config or the scoring runs both suites in CI ([`.github/workflows/eval.yml`](.github/workflows/eval.yml)) and fails if a score drops below the committed baseline.
+
+The runners have no GPU, so CI uses `qwen3:1.7b` on the CPU with temperature 0 and a fixed seed ([`ci/`](ci/)). It runs the translation suite in full, as one parallel job per prompt, and the test-design suite with the techniques prompt and the code checks only: a 1.7B model is too weak a grader for the must-haves to be worth gating on. The CI tier catches prompt and scoring regressions, not the model quality the results above describe.
+
+The baselines in [`baselines/`](baselines/), one per CI job, record the pass rate and each metric per model and prompt. A run fails when any of them falls more than the file's `tolerance` below the recorded value, or when a recorded run or metric is missing. The translation baselines allow 5 points (about 2 of 45 tests); the test-design baseline allows 20 points, one story out of five, because CPU runners differ enough to flip a long generation. The job summary shows the comparison, and the raw results are uploaded as an artifact.
+
+When a change is meant to move a score, update the baseline in the same pull request, so the new numbers are reviewed with the change. The simplest way is to copy the proposed baseline from the failing job's summary. To record one locally, run the same slice CI runs:
+
+```bash
+ollama pull qwen3:1.7b
+npx promptfoo eval -c ci/promptfooconfig.translation.yaml --filter-prompts '^Detailed:' -o outputs/ci/translation-detailed.json
+npm run baseline -- update outputs/ci/translation-detailed.json baselines/ci-translation-detailed.json
+```
+
+Scores on a laptop can differ slightly from the CI runner's, so prefer the numbers from CI. The same commands work on the full suites, for example `npm run baseline -- check outputs/test-design-results.json baselines/local-test-design.json` after recording a local baseline.
+
+To see what changed between two runs, test by test:
+
+```bash
+npm run compare -- outputs/before.json outputs/results.json
+```
+
 ## Project structure
 
 | File | Description |
@@ -127,6 +151,9 @@ Cloud providers, and how to add providers, prompts and tests: [docs/customizing.
 | `prompts/test-design/` | Basic and test-design-techniques prompts |
 | `tests/test-design/stories.yaml` | User stories, acceptance criteria and must-have tests |
 | `tests/test-design/checks.js` | Code checks, with unit tests in `checks.test.js` |
+| `ci/` | CI tier of both suites on a small model |
+| `baselines/` | Committed scores that CI compares each run with |
+| `scripts/` | Baseline check and run comparison |
 | `promptfooconfig.yaml` | Translation suite, local model |
 | `promptfooconfig.full.yaml` | Translation suite with OpenAI, Anthropic and Google added |
 | `prompts/direct.txt`, `detailed.txt`, `code_mixing.txt` | Translation prompts |
@@ -142,11 +169,13 @@ Cloud providers, and how to add providers, prompts and tests: [docs/customizing.
 | `npm run eval:test-design` | Test-design suite on the local models |
 | `npm run eval` | Translation suite on the local model |
 | `npm run eval:full` | Translation suite with cloud providers (needs API keys) |
-| `npm test` | Unit tests for the test-design code checks |
+| `npm test` | Unit tests for the code checks and the baseline scripts |
 | `npm run eval:watch` | Re-run the translation suite on file changes |
 | `npm run report` | View results locally |
 | `npm run publish` | Publish results to the promptfoo web dashboard |
-| `npm run compare` | Compare two evaluation runs |
+| `npm run compare -- <before.json> <after.json>` | Compare two saved runs, score by score and test by test |
+| `npm run eval:ci:translation`, `eval:ci:test-design` | CI tier of each suite on `qwen3:1.7b` |
+| `npm run baseline -- check\|update <results.json> <baseline.json>` | Check a run against a baseline, or record one |
 
 ## License
 

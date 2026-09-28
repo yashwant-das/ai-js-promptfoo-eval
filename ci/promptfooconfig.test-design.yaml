@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# CI tier of the test-design suite: the techniques prompt on a small model that runs on a GitHub
+# runner's CPU, graded by the code checks only. The must-haves are left out because a small model
+# is too weak a grader to gate on; they still run in the full suite. The scores are compared with
+# baselines/ci-test-design.json.
+description: 'Test Design Evaluation — CI (small local model, code checks)'
+
+providers:
+  - id: ollama:chat:qwen3:1.7b
+    label: Qwen 3 1.7B
+    config:
+      temperature: 0
+      seed: 42
+      think: false
+      num_ctx: 6144
+      num_predict: 2048
+
+prompts:
+  - id: file://../prompts/test-design/techniques.txt
+    label: Test design techniques
+
+tests: file://test-design-cases.js
+
+defaultTest:
+  assert:
+    - type: javascript
+      value: file://../tests/test-design/checks.js:validStructure
+      metric: structure
+    - type: javascript
+      value: file://../tests/test-design/checks.js:coversAllCriteria
+      metric: coverage
+    - type: javascript
+      value: file://../tests/test-design/checks.js:includesNegative
+      metric: negative-tests
+    - type: javascript
+      value: file://../tests/test-design/checks.js:includesBoundary
+      metric: boundary-tests
+    - type: javascript
+      value: file://../tests/test-design/checks.js:specificExpectedResults
+      metric: specific-results
+    - type: javascript
+      value: file://../tests/test-design/checks.js:noDuplicateTitles
+      metric: no-duplicates
+
+evaluateOptions:
+  maxConcurrency: 2
