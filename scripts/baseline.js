@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Compares an eval run with a committed baseline, or records a new baseline.
+// Compares an eval run with a saved baseline, or records a new baseline.
 //
 //   node scripts/baseline.js check  <results.json> <baseline.json>
 //   node scripts/baseline.js update <results.json> <baseline.json>

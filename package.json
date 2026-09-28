@@ -8,8 +8,6 @@
     "eval": "promptfoo eval",
     "eval:full": "promptfoo eval -c promptfooconfig.full.yaml",
     "eval:test-design": "promptfoo eval -c promptfooconfig.test-design.yaml",
-    "eval:ci:translation": "promptfoo eval -c ci/promptfooconfig.translation.yaml -o outputs/ci/translation.json",
-    "eval:ci:test-design": "promptfoo eval -c ci/promptfooconfig.test-design.yaml -o outputs/ci/test-design.json",
     "eval:watch": "promptfoo eval -w",
     "test": "node --test \"tests/test-design/*.test.js\" \"scripts/*.test.js\"",
     "publish": "promptfoo publish",
