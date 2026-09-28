@@ -125,7 +125,7 @@ Every pull request that changes a prompt, a test, a config or the scoring runs b
 
 The runners have no GPU, so CI uses `qwen3:1.7b` on the CPU with temperature 0 and a fixed seed ([`ci/`](ci/)). It runs the translation suite in full, as one parallel job per prompt, and the test-design suite with the techniques prompt and the code checks only: a 1.7B model is too weak a grader for the must-haves to be worth gating on. The CI tier catches prompt and scoring regressions, not the model quality the results above describe.
 
-The baselines in [`baselines/`](baselines/), one per CI job, record the pass rate and each metric per model and prompt. A run fails when any of them falls more than the file's `tolerance` below the recorded value, or when a recorded run or metric is missing. The job summary shows the comparison, and the raw results are uploaded as an artifact.
+The baselines in [`baselines/`](baselines/), one per CI job, record the pass rate and each metric per model and prompt. A run fails when any of them falls more than the file's `tolerance` below the recorded value, or when a recorded run or metric is missing. The translation baselines allow 5 points (about 2 of 45 tests); the test-design baseline allows 20 points, one story out of five, because CPU runners differ enough to flip a long generation. The job summary shows the comparison, and the raw results are uploaded as an artifact.
 
 When a change is meant to move a score, update the baseline in the same pull request, so the new numbers are reviewed with the change. The simplest way is to copy the proposed baseline from the failing job's summary. To record one locally, run the same slice CI runs:
 
