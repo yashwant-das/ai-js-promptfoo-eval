@@ -123,18 +123,19 @@ Cloud providers, and how to add providers, prompts and tests: [docs/customizing.
 
 Every pull request that changes a prompt, a test, a config or the scoring runs both suites in CI ([`.github/workflows/eval.yml`](.github/workflows/eval.yml)) and fails if a score drops below the committed baseline.
 
-The runners have no GPU, so CI uses `qwen3:4b` on the CPU with temperature 0 and a fixed seed ([`ci/`](ci/)). It runs the translation suite in full, and the test-design suite with the techniques prompt and the code checks only: a 4B model is too weak a grader for the must-haves to be worth gating on. The CI tier catches prompt and scoring regressions, not the model quality the results above describe.
+The runners have no GPU, so CI uses `qwen3:1.7b` on the CPU with temperature 0 and a fixed seed ([`ci/`](ci/)). It runs the translation suite in full, as one parallel job per prompt, and the test-design suite with the techniques prompt and the code checks only: a 1.7B model is too weak a grader for the must-haves to be worth gating on. The CI tier catches prompt and scoring regressions, not the model quality the results above describe.
 
-The baselines in [`baselines/`](baselines/) record the pass rate and each metric per model and prompt. A run fails when any of them falls more than the file's `tolerance` below the recorded value, or when a recorded run or metric is missing. The job summary shows the comparison, and the raw results are uploaded as an artifact.
+The baselines in [`baselines/`](baselines/), one per CI job, record the pass rate and each metric per model and prompt. A run fails when any of them falls more than the file's `tolerance` below the recorded value, or when a recorded run or metric is missing. The job summary shows the comparison, and the raw results are uploaded as an artifact.
 
-When a change is meant to move a score, update the baseline in the same pull request, so the new numbers are reviewed with the change:
+When a change is meant to move a score, update the baseline in the same pull request, so the new numbers are reviewed with the change. The simplest way is to copy the proposed baseline from the failing job's summary. To record one locally, run the same slice CI runs:
 
 ```bash
-npm run eval:ci:translation      # needs: ollama pull qwen3:4b
-npm run baseline -- update outputs/ci/translation.json baselines/ci-translation.json
+ollama pull qwen3:1.7b
+npx promptfoo eval -c ci/promptfooconfig.translation.yaml --filter-prompts '^Detailed:' -o outputs/ci/translation-detailed.json
+npm run baseline -- update outputs/ci/translation-detailed.json baselines/ci-translation-detailed.json
 ```
 
-or copy the proposed baseline from the failing job's summary. The same commands work on the full suites, for example `npm run baseline -- check outputs/test-design-results.json baselines/local-test-design.json` after recording a local baseline.
+Scores on a laptop can differ slightly from the CI runner's, so prefer the numbers from CI. The same commands work on the full suites, for example `npm run baseline -- check outputs/test-design-results.json baselines/local-test-design.json` after recording a local baseline.
 
 To see what changed between two runs, test by test:
 
@@ -173,7 +174,7 @@ npm run compare -- outputs/before.json outputs/results.json
 | `npm run report` | View results locally |
 | `npm run publish` | Publish results to the promptfoo web dashboard |
 | `npm run compare -- <before.json> <after.json>` | Compare two saved runs, score by score and test by test |
-| `npm run eval:ci:translation`, `eval:ci:test-design` | CI tier of each suite on `qwen3:4b` |
+| `npm run eval:ci:translation`, `eval:ci:test-design` | CI tier of each suite on `qwen3:1.7b` |
 | `npm run baseline -- check\|update <results.json> <baseline.json>` | Check a run against a baseline, or record one |
 
 ## License

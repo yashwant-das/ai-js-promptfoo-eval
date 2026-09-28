@@ -37,22 +37,30 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CI_MODEL: qwen3:4b
+  CI_MODEL: qwen3:1.7b
   OLLAMA_MODELS: ${{ github.workspace }}/.ollama/models
   PROMPTFOO_DISABLE_TELEMETRY: '1'
   PROMPTFOO_DISABLE_UPDATE: '1'
   # Failing tests are expected on a small model; the baseline check decides pass or fail.
   PROMPTFOO_FAILED_TEST_EXIT_CODE: '0'
+  # Fail a stuck request after 3 minutes instead of the default 5, and the whole run after 30.
+  REQUEST_TIMEOUT_MS: '180000'
+  PROMPTFOO_EVAL_TIMEOUT_MS: '1800000'
 
 jobs:
   eval:
-    name: Eval (${{ matrix.suite }})
+    name: Eval (${{ matrix.name }})
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 45
     strategy:
       fail-fast: false
+      # The translation suite is split by prompt into three parallel jobs, since a CPU-bound run is slow.
       matrix:
-        suite: [translation, test-design]
+        include:
+          - { name: translation-direct, suite: translation, prompts: '^Direct \(default\):' }
+          - { name: translation-detailed, suite: translation, prompts: '^Detailed:' }
+          - { name: translation-code-aware, suite: translation, prompts: '^Code-Aware:' }
+          - { name: test-design, suite: test-design, prompts: '.' }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -78,16 +86,23 @@ jobs:
           ollama --version
           ollama pull "$CI_MODEL"
 
-      - name: Run the ${{ matrix.suite }} suite
-        run: npx promptfoo eval -c ci/promptfooconfig.${{ matrix.suite }}.yaml -o outputs/ci/${{ matrix.suite }}.json --no-table --no-share
+      - name: Run ${{ matrix.name }}
+        run: >-
+          npx promptfoo eval -c ci/promptfooconfig.${{ matrix.suite }}.yaml
+          --filter-prompts '${{ matrix.prompts }}'
+          -o outputs/ci/${{ matrix.name }}.json --no-table --no-share --no-progress-bar
 
       - name: Compare with the baseline
-        run: node scripts/baseline.js check outputs/ci/${{ matrix.suite }}.json baselines/ci-${{ matrix.suite }}.json
+        run: node scripts/baseline.js check outputs/ci/${{ matrix.name }}.json baselines/ci-${{ matrix.name }}.json
+
+      - name: Show the Ollama log
+        if: always()
+        run: tail -n 60 "$RUNNER_TEMP/ollama.log" || true
 
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eval-${{ matrix.suite }}
+          name: eval-${{ matrix.name }}
           path: outputs/ci/
           if-no-files-found: ignore

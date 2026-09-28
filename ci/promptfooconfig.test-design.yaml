@@ -7,14 +7,14 @@
 description: 'Test Design Evaluation — CI (small local model, code checks)'
 
 providers:
-  - id: ollama:chat:qwen3:4b
-    label: Qwen 3 4B
+  - id: ollama:chat:qwen3:1.7b
+    label: Qwen 3 1.7B
     config:
       temperature: 0
       seed: 42
       think: false
-      num_ctx: 8192
-      num_predict: 4096
+      num_ctx: 6144
+      num_predict: 2048
 
 prompts:
   - id: file://../prompts/test-design/techniques.txt
