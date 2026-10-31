@@ -4,9 +4,9 @@ Evaluates LLM output with [Promptfoo](https://www.promptfoo.dev) and local model
 
 [![Tests](https://github.com/yashwant-das/ai-js-promptfoo-eval/actions/workflows/tests.yml/badge.svg)](https://github.com/yashwant-das/ai-js-promptfoo-eval/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Promptfoo](https://img.shields.io/badge/Promptfoo-0.123-4B32C3)](https://www.promptfoo.dev)
+[![Promptfoo](https://img.shields.io/badge/Promptfoo-0.125.1-4B32C3)](https://www.promptfoo.dev)
 [![Ollama](https://img.shields.io/badge/Ollama-local-000000?logo=ollama&logoColor=white)](https://ollama.com)
-[![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 
 ## Why it exists
 
@@ -15,26 +15,30 @@ Evaluates LLM output with [Promptfoo](https://www.promptfoo.dev) and local model
 - **Test design**: a model writes test cases from a user story, and the suite grades them.
 - **Translation**: translation quality across prompts, including idioms, code, numbers and scripts.
 
+This demonstrates deterministic assertion design, story-specific model grading, prompt/model comparison, multilingual edge-case testing and regression checks against saved runs.
+
 ## Architecture
 
 ```mermaid
-flowchart LR
-    Stories[User stories and<br/>acceptance criteria] --> PF[Promptfoo]
+flowchart TB
+    Stories["User stories and acceptance criteria"] --> PF[Promptfoo]
     Prompts[Prompts] --> PF
-    PF -->|generate| Model[Local model<br/>via Ollama]
-    Model -->|JSON test cases| Checks[Code checks<br/>checks.js]
-    Model -->|JSON test cases| Grader[Grader model<br/>must-have tests]
-    Checks --> Report[Promptfoo report<br/>and outputs/]
+    PF -->|generate| Model["Local model via Ollama"]
+    Model -->|JSON test cases| Checks["Code checks: checks.js"]
+    Model -->|JSON test cases| Grader["Grader model: must-have tests"]
+    Checks --> Report["Promptfoo report and outputs/"]
     Grader --> Report
 ```
 
 Each model output goes through both layers: code checks with no model involved, then a grader model that looks for each must-have test separately.
 
+See [architecture](docs/architecture.md) for config loading, grading boundaries and saved-run analysis. The [tech stack](#tech-stack) and [project structure](#project-structure) below map the tools and files.
+
 ## Quickstart
 
 Prerequisites:
 
-- [Node.js](https://nodejs.org) 22.22 or later
+- [Node.js](https://nodejs.org) 24 (development baseline); Node 22.22 is also verified, with `>=22.22.0` retained in the manifest
 - [Ollama](https://ollama.com) running locally with the tested models pulled:
 
   ```bash
@@ -46,22 +50,24 @@ The `-mlx` builds run on Apple Silicon. On other machines, use the standard Qwen
 
 ```bash
 git clone https://github.com/yashwant-das/ai-js-promptfoo-eval.git && cd ai-js-promptfoo-eval
-npm install                  # installs promptfoo locally
-npm test                     # unit tests for the code checks, no model needed
+npm ci                       # installs the locked promptfoo and development tools
+npm test                     # 16 unit tests for checks and baseline scripts, no model needed
 npm run eval:test-design     # test-design suite
 npm run eval                 # translation suite
 npm run report               # open the results in your browser
 ```
 
+Successful offline verification reports `16` passing tests with no failures. Run `npm run lint` for the static checks; [development](docs/development.md) covers contributor setup and hooks.
+
 ## Test reports and results
 
-- CI runs the unit tests for the code checks and the baseline scripts on every push and pull request. Evaluations need local models, so they run only on a developer machine, never in CI.
+- CI runs JavaScript lint, formatting, Markdown and text/config checks, plus the unit tests for the code checks and the baseline scripts on every push and pull request. Evaluations need local models, so they run only on a developer machine, never in CI.
 - `npm run report` opens the Promptfoo viewer for the latest run; results are also written to `outputs/`. `npm run publish` shares a run to the Promptfoo web dashboard.
 
 ### Test design suite results (2026-09-26, Apple M4 Max, 64 GB)
 
 | Model | Prompt | All checks pass | Must-haves found | Tests per story | Time per story |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Qwen 3.8 27B | Basic | 3/5 | 17/19 | 8.0 | 31 s |
 | Qwen 3.8 27B | Test design techniques | 4/5 | 18/19 | 12.2 | 39 s |
 | Qwen 3.6 35B | Basic | 1/5 | 13/19 | 6.6 | 28 s |
@@ -101,7 +107,7 @@ A model reads a user story and its acceptance criteria, and returns test cases a
 **Code checks** ([`tests/test-design/checks.js`](tests/test-design/checks.js)) run on every output, with no model involved:
 
 | Metric | Passes when |
-|---|---|
+| --- | --- |
 | `structure` | The output is valid JSON with 1 to 30 complete test cases |
 | `coverage` | Every acceptance criterion is covered by at least one test |
 | `negative-tests` | At least one negative test |
@@ -113,7 +119,7 @@ A model reads a user story and its acceptance criteria, and returns test cases a
 
 The five stories cover account lockout, password reset, a discount code, document upload and bank transfers. Two prompts are compared: a plain request, and one that asks for named test design techniques (boundary value analysis, equivalence partitioning, state transitions).
 
-`npm test` runs unit tests for the code checks and the baseline scripts. They need no model, and they are the only tests CI runs.
+`npm test` runs unit tests for the code checks and the baseline scripts. They need no model, and they are the only tests CI runs; static quality checks run separately.
 
 ### Translation suite
 
@@ -127,15 +133,15 @@ Cloud providers, and how to add providers, prompts and tests: [docs/customizing.
 
 | Layer | Tool | Version | Why |
 | --- | --- | --- | --- |
-| Evaluation | Promptfoo | 0.123 | Declarative configs, model-graded assertions and a results viewer |
+| Evaluation | Promptfoo | 0.125.1 | Declarative configs, model-graded assertions and a results viewer |
 | Models | Ollama with Qwen 3.8 27B and Qwen 3.6 35B | local | No API keys or per-token cost; runs on Apple Silicon |
-| Code checks | Node.js test runner | 22 | Unit tests for the checks with no extra dependencies |
+| Code checks | Node.js test runner | 24 and 22.22 | Unit tests for the checks with no extra dependencies |
 | Optional cloud providers | OpenAI, Anthropic, Google | see docs | Comparison against hosted models |
 
 ## Project structure
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `promptfooconfig.test-design.yaml` | Test-design suite: two local models, code checks and model-graded must-haves |
 | `prompts/test-design/` | Basic and test-design-techniques prompts |
 | `tests/test-design/stories.yaml` | User stories, acceptance criteria and must-have tests |
@@ -147,21 +153,30 @@ Cloud providers, and how to add providers, prompts and tests: [docs/customizing.
 | `tests/translations.yaml`, `tests/edge_cases.yaml` | Translation tests |
 | `outputs/` | Evaluation results (git-ignored) |
 | `.env.example` | API key template for cloud providers |
+| `docs/architecture.md`, `docs/development.md` | Internals, contributor setup, quality gates and verification evidence |
+| `AGENTS.md` | Instructions for coding agents |
 | `docs/customizing.md` | Cloud providers, adding providers, prompts and tests |
 
 ## Commands
 
 | Command | Description |
-|---|---|
+| --- | --- |
 | `npm run eval:test-design` | Test-design suite on the local models |
 | `npm run eval` | Translation suite on the local model |
 | `npm run eval:full` | Translation suite with cloud providers (needs API keys) |
 | `npm test` | Unit tests for the code checks and the baseline scripts |
+| `npm run lint` | JavaScript lint, format and Markdown checks without models |
 | `npm run eval:watch` | Re-run the translation suite on file changes |
 | `npm run report` | View results locally |
 | `npm run publish` | Publish results to the promptfoo web dashboard |
 | `npm run compare -- <before.json> <after.json>` | Compare two saved runs, score by score and test by test |
 | `npm run baseline -- check\|update <results.json> <baseline.json>` | Check a run against a baseline, or record one |
+
+## Documentation
+
+- [Architecture](docs/architecture.md): suite execution, component responsibilities, grading boundaries and saved-run analysis.
+- [Development](docs/development.md): reproducible setup, quality gates, troubleshooting and verification scope.
+- [Customizing the suites](docs/customizing.md): cloud providers and complete provider, prompt and test examples.
 
 ## License
 

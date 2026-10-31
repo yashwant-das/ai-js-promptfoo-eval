@@ -21,10 +21,20 @@ function compareToBaseline(current, baseline) {
   for (const [key, base] of Object.entries(baseline.runs ?? {})) {
     const run = current[key];
     if (!run) {
-      rows.push({ run: key, score: 'all', baseline: null, current: null, regressed: true, note: 'run missing from results' });
+      rows.push({
+        run: key,
+        score: 'all',
+        baseline: null,
+        current: null,
+        regressed: true,
+        note: 'run missing from results',
+      });
       continue;
     }
-    const scores = [['pass rate', base.passRate, run.passRate], ...Object.entries(base.metrics ?? {}).map(([m, v]) => [m, v, run.metrics[m]])];
+    const scores = [
+      ['pass rate', base.passRate, run.passRate],
+      ...Object.entries(base.metrics ?? {}).map(([m, v]) => [m, v, run.metrics[m]]),
+    ];
     for (const [score, was, now] of scores) {
       const missing = now === undefined;
       rows.push({
@@ -52,13 +62,16 @@ function report({ tolerance, rows, regressed }) {
       return `| ${r.run} | ${r.score} | ${fmt(r.baseline)} | ${fmt(r.current)} | ${mark} ${r.note} |`;
     }),
     '',
-    regressed ? '**Regression: at least one score fell below the baseline.**' : 'No score fell below the baseline.',
+    regressed
+      ? '**Regression: at least one score fell below the baseline.**'
+      : 'No score fell below the baseline.',
   ];
   return lines.join('\n');
 }
 
 function writeSummary(markdown) {
-  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${markdown}\n`);
+  if (process.env.GITHUB_STEP_SUMMARY)
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${markdown}\n`);
 }
 
 function buildBaseline(data, runs, previous) {
@@ -78,10 +91,15 @@ function main([command, resultsFile, baselineFile]) {
   }
   const data = load(resultsFile);
   const runs = summarize(data);
-  const previous = fs.existsSync(baselineFile) ? JSON.parse(fs.readFileSync(baselineFile, 'utf8')) : null;
+  const previous = fs.existsSync(baselineFile)
+    ? JSON.parse(fs.readFileSync(baselineFile, 'utf8'))
+    : null;
 
   if (command === 'update') {
-    fs.writeFileSync(baselineFile, `${JSON.stringify(buildBaseline(data, runs, previous), null, 2)}\n`);
+    fs.writeFileSync(
+      baselineFile,
+      `${JSON.stringify(buildBaseline(data, runs, previous), null, 2)}\n`,
+    );
     console.log(`Wrote ${baselineFile}`);
     return 0;
   }

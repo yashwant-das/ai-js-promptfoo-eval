@@ -13,7 +13,11 @@
     "publish": "promptfoo publish",
     "report": "promptfoo view",
     "compare": "node scripts/compare.js",
-    "baseline": "node scripts/baseline.js"
+    "baseline": "node scripts/baseline.js",
+    "lint:js": "eslint .",
+    "format:check": "prettier --check \"**/*.{js,json,jsonc}\"",
+    "lint:md": "markdownlint-cli2 \"*.md\" \"docs/**/*.md\"",
+    "lint": "npm run lint:js && npm run format:check && npm run lint:md"
   },
   "keywords": [
     "promptfoo",
@@ -33,7 +37,17 @@
     "url": "https://github.com/yashwant-das/ai-js-promptfoo-eval/issues"
   },
   "devDependencies": {
-    "js-yaml": "^5.4.2",
-    "promptfoo": "^0.124.1"
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "globals": "17.13.0",
+    "js-yaml": "5.5.0",
+    "markdownlint-cli2": "0.24.0",
+    "prettier": "3.9.10",
+    "promptfoo": "0.125.1"
+  },
+  "overrides": {
+    "markdownlint": {
+      "re2js": "2.8.7"
+    }
   }
 }

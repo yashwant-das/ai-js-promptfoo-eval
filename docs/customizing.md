@@ -11,7 +11,7 @@ npm run eval:full
 ```
 
 | Provider | Model ID | Temp | API Key |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | OpenAI | `gpt-4.1-mini` | 0.3 | `OPENAI_API_KEY` |
 | OpenAI | `gpt-4o` | 0.3 | `OPENAI_API_KEY` |
 | OpenAI | `o3-mini` | 0.3 | `OPENAI_API_KEY` |

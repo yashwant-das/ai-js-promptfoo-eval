@@ -1,0 +1,12 @@
+node_modules/
+outputs/
+.promptfoo/
+.superpowers/
+docs/superpowers/
+package-lock.json
+prompts/
+tests/*.yaml
+tests/test-design/*.yaml
+promptfooconfig*.yaml
+*.md
+docs/**/*.md
