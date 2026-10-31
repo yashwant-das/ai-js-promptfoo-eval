@@ -126,7 +126,7 @@ The README previews come from the owner's later `npm run eval:test-design` and `
 | `outputs/test-design-results.json` | 2026-10-31 14:39:48 | 12/20 passed, 8 assertion failures, 0 errors; 5 cached generation results | Pass-rate, score-distribution and prompt-comparison graphs plus all four model/prompt columns |
 | `outputs/results.json` | 2026-10-31 14:51:48 | 135/135 passed, 0 failures, 0 errors | All three prompt columns and multilingual output examples |
 
-Promptfoo suppresses charts when every score is the same binary edge value, so the translation preview deliberately uses the results table. Screenshots focus on the report content, excluding the date/ID metadata header. They were captured from the actual viewer and visually inspected; no scores, prompts or evaluation data were modified. The October 19 screenshot is superseded by these two previews. Historical benchmark tables and interpretation text remain unchanged. Only the previews are committed; raw exports and the isolated viewer database stay local. No evaluation rerun or `npm run publish` was needed.
+Promptfoo suppresses charts when every score is the same binary edge value, so the translation preview deliberately uses the results table. Screenshots retain the viewer header, including its run date and ID; the README captions omit dates. They were captured from the actual viewer and visually inspected; no scores, prompts or evaluation data were modified. The October 19 screenshot is superseded by these two previews. Historical benchmark tables and interpretation text remain unchanged. Only the previews are committed; raw exports and the isolated viewer database stay local. No evaluation rerun or `npm run publish` was needed.
 
 ### Hosted verification and remaining review
 
