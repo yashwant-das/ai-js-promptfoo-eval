@@ -16,7 +16,9 @@ function load(file) {
 function runKey(result, configPrompts = []) {
   const provider = result.provider?.label || result.provider?.id || 'unknown provider';
   const full = result.prompt?.label || result.promptId || 'unknown prompt';
-  const configured = configPrompts.map((p) => p?.label).find((label) => label && (full === label || full.startsWith(`${label}: `)));
+  const configured = configPrompts
+    .map((p) => p?.label)
+    .find((label) => label && (full === label || full.startsWith(`${label}: `)));
   return `${provider} · ${configured ?? full}`;
 }
 

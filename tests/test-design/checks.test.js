@@ -26,8 +26,16 @@ const goodCases = [
 ];
 
 const asJson = (cases) => JSON.stringify({ test_cases: cases });
-const run = (name, cases, ctx = context) => checks[name](typeof cases === 'string' ? cases : asJson(cases), ctx);
-const allChecks = ['validStructure', 'coversAllCriteria', 'includesNegative', 'includesBoundary', 'specificExpectedResults', 'noDuplicateTitles'];
+const run = (name, cases, ctx = context) =>
+  checks[name](typeof cases === 'string' ? cases : asJson(cases), ctx);
+const allChecks = [
+  'validStructure',
+  'coversAllCriteria',
+  'includesNegative',
+  'includesBoundary',
+  'specificExpectedResults',
+  'noDuplicateTitles',
+];
 
 test('a good set of test cases passes every check', () => {
   for (const name of allChecks) {
@@ -86,14 +94,25 @@ test('includesBoundary is required only when the story has limits', () => {
 });
 
 test('specificExpectedResults flags vague expected results', () => {
-  for (const vague of ['Login works as expected', 'The feature works correctly', 'Success', 'should work']) {
-    const result = run('specificExpectedResults', [goodCases[0], { ...goodCases[1], expected: vague }]);
+  for (const vague of [
+    'Login works as expected',
+    'The feature works correctly',
+    'Success',
+    'should work',
+  ]) {
+    const result = run('specificExpectedResults', [
+      goodCases[0],
+      { ...goodCases[1], expected: vague },
+    ]);
     assert.equal(result.pass, false, vague);
     assert.equal(result.score, 0.5, vague);
   }
 });
 
 test('noDuplicateTitles ignores case and punctuation', () => {
-  const dupes = [goodCases[0], { ...goodCases[1], title: 'fifth failed attempt LOCKS the account!' }];
+  const dupes = [
+    goodCases[0],
+    { ...goodCases[1], title: 'fifth failed attempt LOCKS the account!' },
+  ];
   assert.equal(run('noDuplicateTitles', dupes).pass, false);
 });

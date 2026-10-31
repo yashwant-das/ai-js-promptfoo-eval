@@ -25,3 +25,6 @@ dist/
 # Logs
 *.log
 npm-debug.log*
+
+# Agent execution scratch (plans remain tracked under docs/)
+.superpowers/
