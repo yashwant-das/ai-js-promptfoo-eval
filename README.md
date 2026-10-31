@@ -1,4 +1,4 @@
-# ai-js-promptfoo-eval
+# LLM Quality Evaluation with Promptfoo
 
 Evaluates LLM output with [Promptfoo](https://www.promptfoo.dev) and local models through [Ollama](https://ollama.com): test cases a model writes from user stories, and translation quality. No API keys needed.
 
