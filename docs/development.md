@@ -115,7 +115,9 @@ Both complete local suites ran on Node 24.22.1 with Promptfoo 0.125.1, unchanged
 
 The saved 2026-10-19 run contains 14/20 passing cases. Comparing against that run flags pass-rate/metric drops beyond the default five-point baseline tolerance. The baseline command correctly exits 1 for these drops; a same-file baseline roundtrip passes. `compare` consumes the fresh output and reports changed cases. These observations do not isolate dependency effects from generation/grading variability; review the raw outputs before accepting an upgrade baseline. No baseline was automatically accepted, and no benchmark was rewritten. Owner review of the new scores remains pending.
 
-### Latest report previews (2026-10-31)
+### Report previews
+
+The reference test-design and translation benchmarks in the README were recorded on 2026-09-26; the test-design hardware was an Apple M4 Max with 64 GB of memory. Dates are retained here for provenance, while the README distinguishes the report previews from the reference benchmarks by name.
 
 The README previews come from the owner's later `npm run eval:test-design` and `npm run eval` exports, loaded into an isolated Promptfoo 0.125.1 viewer database. They are separate from the earlier standards-verification runs above and the September benchmark.
 
@@ -124,7 +126,7 @@ The README previews come from the owner's later `npm run eval:test-design` and `
 | `outputs/test-design-results.json` | 2026-10-31 14:39:48 | 12/20 passed, 8 assertion failures, 0 errors; 5 cached generation results | Pass-rate, score-distribution and prompt-comparison graphs plus all four model/prompt columns |
 | `outputs/results.json` | 2026-10-31 14:51:48 | 135/135 passed, 0 failures, 0 errors | All three prompt columns and multilingual output examples |
 
-Promptfoo suppresses charts when every score is the same binary edge value, so the translation preview deliberately uses the results table. Screenshots were captured from the actual viewer and visually inspected; no scores, prompts or evaluation data were modified. The October 19 screenshot is superseded by these two previews. Historical benchmark tables and interpretation text remain unchanged. Only the previews are committed; raw exports and the isolated viewer database stay local. No evaluation rerun or `npm run publish` was needed.
+Promptfoo suppresses charts when every score is the same binary edge value, so the translation preview deliberately uses the results table. Screenshots focus on the report content, excluding the date/ID metadata header. They were captured from the actual viewer and visually inspected; no scores, prompts or evaluation data were modified. The October 19 screenshot is superseded by these two previews. Historical benchmark tables and interpretation text remain unchanged. Only the previews are committed; raw exports and the isolated viewer database stay local. No evaluation rerun or `npm run publish` was needed.
 
 ### Hosted verification and remaining review
 

@@ -37,7 +37,7 @@ flowchart TB
     Assertions --> Results
 ```
 
-Test-design generation uses `qwen3.8:27b-mlx` and `qwen3.6:35b-mlx` at temperature 0.2. The default grader is `qwen3.8:27b-mlx` at temperature 0. Each generated response is assessed by both code and story-specific model assertions; the code layer is not a routing gate that substitutes for grading. The grader's self-grading bias remains explicit in the [README](../README.md#test-design-suite-results-2026-09-26-apple-m4-max-64-gb).
+Test-design generation uses `qwen3.8:27b-mlx` and `qwen3.6:35b-mlx` at temperature 0.2. The default grader is `qwen3.8:27b-mlx` at temperature 0. Each generated response is assessed by both code and story-specific model assertions; the code layer is not a routing gate that substitutes for grading. The grader's self-grading bias remains explicit in the [README](../README.md#test-design-reference-benchmark-apple-m4-max-64-gb).
 
 The deterministic parser accepts a JSON object, including an object inside a code fence or surrounding text. It reads the `test_cases` array. Malformed output yields failed assertion results rather than a successful evaluation. Assertions examine structure, criterion coverage, negative/boundary categories, expected-result specificity and duplicate titles; category labels and coverage declarations do not independently prove test quality. The grader supplies the second assessment layer.
 

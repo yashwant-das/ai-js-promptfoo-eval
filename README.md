@@ -64,11 +64,11 @@ Successful offline verification reports `16` passing tests with no failures. Run
 - CI runs JavaScript lint, formatting, Markdown and text/config checks, plus the unit tests for the code checks and the baseline scripts on every push and pull request. Evaluations need local models, so they run only on a developer machine, never in CI.
 - `npm run report` opens the Promptfoo viewer for the latest run; results are also written to `outputs/`. `npm run publish` shares a run to the Promptfoo web dashboard.
 
-![Test-design report with pass-rate, score-distribution and prompt-comparison graphs, plus all four model/prompt result columns](docs/assets/test-design-report-2026-10-31.png)
+![Test-design report with pass-rate, score-distribution and prompt-comparison graphs, plus all four model/prompt result columns](docs/assets/test-design-report.png)
 
-Latest test-design report (2026-10-31): **12/20 cases passed**, 8 assertion failures and no execution errors. The four comparisons are Qwen 3.8 Basic, Qwen 3.8 Test design techniques, Qwen 3.6 Basic and Qwen 3.6 Test design techniques. This run includes 5 cached generation results and is separate from the historical benchmark below. Click the screenshot to inspect the full-size report preview.
+Test-design report: **12/20 cases passed**, 8 assertion failures and no execution errors. The four comparisons are Qwen 3.8 Basic, Qwen 3.8 Test design techniques, Qwen 3.6 Basic and Qwen 3.6 Test design techniques. This run includes 5 cached generation results and is separate from the historical benchmark below. Click the screenshot to inspect the full-size report preview.
 
-### Test design suite results (2026-09-26, Apple M4 Max, 64 GB)
+### Test design reference benchmark (Apple M4 Max, 64 GB)
 
 | Model | Prompt | All checks pass | Must-haves found | Tests per story | Time per story |
 | --- | --- | --- | --- | --- | --- |
@@ -87,11 +87,11 @@ Writing must-haves: the grader tends to read example values literally. State the
 
 ### Translation suite results
 
-On 2026-09-26, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both from the Detailed prompt: "ハローワールド" instead of "こんにちは世界" for "Hello world", and "Salut !" for "What's up?".
+In the reference benchmark, Qwen 3.8 27B passed 133 of 135 checks. The two misses were both from the Detailed prompt: "ハローワールド" instead of "こんにちは世界" for "Hello world", and "Salut !" for "What's up?".
 
-![Translation report showing Direct, Detailed and Code-Aware prompt results with all three passing 45 of 45 cases](docs/assets/translation-report-2026-10-31.png)
+![Translation report showing Direct, Detailed and Code-Aware prompt results with all three passing 45 of 45 cases](docs/assets/translation-report.png)
 
-Latest translation report (2026-10-31): **135/135 cases passed**, with no assertion failures or execution errors. All three prompts passed 45/45 cases. Promptfoo omits graphs for this run because every score is the same binary pass value; the table shows the prompt comparisons and multilingual outputs.
+Translation report: **135/135 cases passed**, with no assertion failures or execution errors. All three prompts passed 45/45 cases. Promptfoo omits graphs for this run because every score is the same binary pass value; the table shows the prompt comparisons and multilingual outputs.
 
 ### Baselines and comparing runs
 
