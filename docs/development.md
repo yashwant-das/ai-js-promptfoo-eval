@@ -79,7 +79,7 @@ Profile: `complete`. Policy revision: [a429dd2f2da55a4c3e1c73c7c0d1111f9cd0b9a9]
 
 ### Execution evidence
 
-Verification is in progress. The pre-adoption unit baseline passed 16/16 on Node 26.13.0. Fresh supported-runtime installs, static checks, staged probes, rendering, model runs, hosted checks and remote setting audit are recorded here after execution; an unrun check is not a pass.
+The pre-adoption unit baseline passed 16/16 on Node 26.13.0. Supported-runtime, static, staged, presentation and model evidence follows. Passing offline checks does not imply every model output passed grading or that pending security/settings work is complete.
 
 ### Local verification (2026-10-31)
 
@@ -104,4 +104,21 @@ The remote audit found an active default-branch ruleset preventing deletion and 
 
 The existing description is 103 characters and already starts with “Grades”; retain it. Proposed topics for owner review: `ai-testing`, `javascript`, `promptfoo`, `ollama`, `llm-evaluation`, `test-generation`, `test-design`, `translation`. This removes the unused LM Studio topic. Metadata was not changed.
 
-Live local-model runs and hosted checks are still in progress at this implementation checkpoint. Cloud evaluations and publishing are not run. No fresh model result supersedes the dated README benchmarks.
+### Local-model execution
+
+Both complete local suites ran on Node 24.22.1 with Promptfoo 0.125.1, unchanged prompts/configs/data, `--no-cache`, `--no-share` and `--no-write`. Results were exported separately and retained locally under ignored `outputs/standards-verification-2026-10-31/`; the existing results and baselines were preserved byte-for-byte.
+
+| Suite | Result | Interpretation |
+| --- | --- | --- |
+| Translation | 135/135 passed; no assertion failures or execution errors; 1m 7s | Real generation and assertion execution across all three prompts |
+| Test design | 11/20 passed, 9 assertion failures, 0 execution errors; 10m 5s | Real generation on both configured models and grading; this is completed execution, **not an all-green model evaluation** |
+
+The saved 2026-10-19 run contains 14/20 passing cases. Comparing against that run flags pass-rate/metric drops beyond the default five-point baseline tolerance. The baseline command correctly exits 1 for these drops; a same-file baseline roundtrip passes. `compare` consumes the fresh output and reports changed cases. These observations do not isolate dependency effects from generation/grading variability; review the raw outputs before accepting an upgrade baseline. No baseline was automatically accepted, and no benchmark was rewritten. Owner review of the new scores remains pending.
+
+The report screenshot in the README comes from the saved **2026-10-19** run (Promptfoo 0.123.1), imported into an isolated 0.125.1 viewer database. It shows only the two Qwen 3.8 prompt columns and is explicitly separate from both the September benchmark and fresh verification. The screenshot is the committed preview; the raw results and viewer database were not uploaded, and `npm run publish` was not run.
+
+### Hosted verification and remaining review
+
+At implementation head `2807b9e944a32834a3fffff45952f8e9c1dd590a`, both hosted checks passed: Node 24 quality/unit (37s) and Node 22 compatibility (28s). Later evidence/documentation commits require their own head checks; previous-head success does not satisfy that gate.
+
+[Draft PR #5](https://github.com/yashwant-das/ai-js-promptfoo-eval/pull/5) remains for owner review of score differences, outstanding audit findings and settings proposals. Cloud-provider calls, publishing, merge and metadata/settings changes were not performed. Full compliance and unchanged model quality are not claimed.

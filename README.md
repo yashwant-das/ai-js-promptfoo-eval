@@ -64,6 +64,10 @@ Successful offline verification reports `16` passing tests with no failures. Run
 - CI runs JavaScript lint, formatting, Markdown and text/config checks, plus the unit tests for the code checks and the baseline scripts on every push and pull request. Evaluations need local models, so they run only on a developer machine, never in CI.
 - `npm run report` opens the Promptfoo viewer for the latest run; results are also written to `outputs/`. `npm run publish` shares a run to the Promptfoo web dashboard.
 
+![Promptfoo viewer comparing the Basic and Test design techniques prompts for Qwen 3.8 27B, with deterministic metrics and must-have scores](docs/assets/test-design-viewer-2026-10-19.png)
+
+Viewer preview from a saved local run on 2026-10-19; the two Qwen 3.8 prompt columns are shown. This is a separate run from the dated benchmark below.
+
 ### Test design suite results (2026-09-26, Apple M4 Max, 64 GB)
 
 | Model | Prompt | All checks pass | Must-haves found | Tests per story | Time per story |

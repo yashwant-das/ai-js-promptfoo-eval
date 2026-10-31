@@ -1,6 +1,6 @@
 # Promptfoo Eval Repo Standards Adoption Implementation Plan
 
-> **For agentic workers:** Use `superpowers:executing-plans` to implement this plan task by task after owner review. Steps use checkboxes for tracking. This document is a proposed plan, not evidence of completed adoption.
+> **For agentic workers:** Use `superpowers:executing-plans` to implement this plan task by task after owner review. Steps use checkboxes for tracking. This is the approved historical execution plan. Implementation and verification are recorded in [development](../../development.md); full adoption remains pending owner review of model-score differences, security findings and repository settings.
 
 **Goal:** Apply the `complete` repo-standards profile while preserving all existing documentation information and the flagship README's technical depth and impact.
 
@@ -99,68 +99,70 @@ Every row must be reconciled against the baseline diff, including subordinate pa
 
 **Files:** Read the complete tracked target tree and affected standards; no product changes. Record evidence later in `docs/development.md`.
 
-- [ ] Recheck status, fetch the default branch and inspect any remote changes since the audited SHA. Preserve this plan and unrelated work; do not reset either. Create a dedicated adoption branch/isolated checkout following the applicable workspace instructions.
-- [ ] Verify the selected standards revision exists remotely. Read any changed policy before pinning; record the exact SHA/profile, not a floating branch.
-- [ ] Save baseline copies/hashes of both docs and protected evaluation inputs outside ignored result paths. Inventory every heading, paragraph, table row, link and fenced example for reconciliation.
-- [ ] Capture `npm test`, Node/npm versions, resolved package versions and tracked/ignored state. Expected starting test result: 16 passes with no skipped tests. Investigate any difference before proceeding.
-- [ ] Identify existing local outputs/baselines without modifying them. Keep real results, keys and ignored files out of commits; do not overwrite a trusted run while gathering evidence.
+- [x] Recheck status, fetch the default branch and inspect any remote changes since the audited SHA. Preserve this plan and unrelated work; do not reset either. Create a dedicated adoption branch/isolated checkout following the applicable workspace instructions.
+- [x] Verify the selected standards revision exists remotely. Read any changed policy before pinning; record the exact SHA/profile, not a floating branch.
+- [x] Save baseline copies/hashes of both docs and protected evaluation inputs outside ignored result paths. Inventory every heading, paragraph, table row, link and fenced example for reconciliation.
+- [x] Capture `npm test`, Node/npm versions, resolved package versions and tracked/ignored state. Expected starting test result: 16 passes with no skipped tests. Investigate any difference before proceeding.
+- [x] Identify existing local outputs/baselines without modifying them. Keep real results, keys and ignored files out of commits; do not overwrite a trusted run while gathering evidence.
 
 ## Task 2: Extend documentation without diminishing the showcase
 
 **Files:** Modify `README.md` and minimally `docs/customizing.md`; create `docs/architecture.md`, `docs/development.md`, `AGENTS.md`.
 
-- [ ] Add focused capability bullets covering deterministic assertions, per-story must-haves, prompt/model comparisons, translation edge cases and baseline regression checks, using existing facts. Avoid duplicating the full explanations.
-- [ ] Retain the benchmark tables, analysis, grader caveats, suite details and baseline examples in the README. If rearranging stack/structure or usage to follow the standard's sequence, move sections intact and check old anchors/incoming links.
-- [ ] Keep an inline root grading diagram; verify it describes both grading layers without implying code-check failure prevents grading. Add deep diagrams to architecture for suite configuration, generation, grading and result consumption, with Ollama/cloud boundaries and sequential CLI use.
-- [ ] Explain responsibilities of `checks.js`, `results.js`, `baseline.js`, `compare.js`, configs and test data. Document tolerance units, missing run/metric failure and errors counted as failures. Link to README results and customization examples rather than copying their catalogs.
-- [ ] Write development setup/configuration, offline-versus-live execution matrix, report handling, quality commands, troubleshooting, runtime decisions and verification ledger. Keep model tags, temperatures, grader/concurrency settings and all config examples unchanged.
-- [ ] Add `AGENTS.md` with profile `complete`, verified standards SHA, actual project commands, documentation-preservation instructions, secret/trust boundaries and required hook behavior. Add a README index linking all three maintained guides and explaining their roles.
-- [ ] Reconcile every preservation-inventory row with baseline copies. Check **all** deleted/changed prose and code, not just matching headings. Parse/check the Windows-path YAML example to ensure it retains its regex meaning. Record any factual adjustment with source/evidence; no speculative corrections to accurate docs.
-- [ ] Render and visually inspect the root README, tables and Mermaid diagrams; check layout, grading arrows, links and anchors. Verify benchmark prominence and readability. Use an authentic report preview only if available, with date/run scope and readable captions; otherwise record the preview as pending.
+- [x] Add focused capability bullets covering deterministic assertions, per-story must-haves, prompt/model comparisons, translation edge cases and baseline regression checks, using existing facts. Avoid duplicating the full explanations.
+- [x] Retain the benchmark tables, analysis, grader caveats, suite details and baseline examples in the README. If rearranging stack/structure or usage to follow the standard's sequence, move sections intact and check old anchors/incoming links.
+- [x] Keep an inline root grading diagram; verify it describes both grading layers without implying code-check failure prevents grading. Add deep diagrams to architecture for suite configuration, generation, grading and result consumption, with Ollama/cloud boundaries and sequential CLI use.
+- [x] Explain responsibilities of `checks.js`, `results.js`, `baseline.js`, `compare.js`, configs and test data. Document tolerance units, missing run/metric failure and errors counted as failures. Link to README results and customization examples rather than copying their catalogs.
+- [x] Write development setup/configuration, offline-versus-live execution matrix, report handling, quality commands, troubleshooting, runtime decisions and verification ledger. Keep model tags, temperatures, grader/concurrency settings and all config examples unchanged.
+- [x] Add `AGENTS.md` with profile `complete`, verified standards SHA, actual project commands, documentation-preservation instructions, secret/trust boundaries and required hook behavior. Add a README index linking all three maintained guides and explaining their roles.
+- [x] Reconcile every preservation-inventory row with baseline copies. Check **all** deleted/changed prose and code, not just matching headings. Parse/check the Windows-path YAML example to ensure it retains its regex meaning. Record any factual adjustment with source/evidence; no speculative corrections to accurate docs.
+- [x] Render and visually inspect the root README, tables and Mermaid diagrams; check layout, grading arrows, links and anchors. Verify benchmark prominence and readability. Use an authentic report preview only if available, with date/run scope and readable captions; otherwise record the preview as pending.
 
 ## Task 3: Align runtime and dependencies deliberately
 
 **Files:** `package.json`, `package-lock.json`, `.node-version`, related narrow README/development updates.
 
-- [ ] Review Node 24 support against official runtime and dependency sources; confirm native/transitive installation needs. Present the concrete 22-to-24 compatibility evidence for the baseline decision. Until decided, preserve Node 22 declarations and record alignment as pending.
-- [ ] On approval of Node 24, coordinate `.node-version`, package engines, CI, README prerequisites/badge/stack and development instructions. State the tested runtime range accurately; do not treat a lower-bound engine declaration as evidence for all future majors.
-- [ ] Resolve compatible stable package/tool versions from official registries/release notes at execution time; inspect Promptfoo config/assertion/output compatibility before selecting an upgrade. Do not equate successful unit tests with successful Promptfoo evaluation.
-- [ ] Add bounded ESLint, Prettier and markdownlint-cli2 development dependencies and lock the complete installation. Preserve CommonJS and every existing npm script. Do not remove `js-yaml` simply because its usage needs investigation.
-- [ ] Use `npm ci` in a fresh checkout on the selected runtime; rerun the 16 existing tests and check Promptfoo CLI startup/config references without paid or implicit model requests. Update README install to `npm ci` only with that evidence.
-- [ ] If evaluation dependencies/runtime change, run both local suites when their models are available and verify result JSON consumption by baseline/compare. Save new runs under distinct names. If unavailable, document exact skipped integrations and leave compatibility/completion claims pending; never relabel old benchmark results as new evidence.
-- [ ] Reconcile current Promptfoo badge/stack with the selected manifest/lock. Do not infer or rewrite the tool version used for the historical benchmark; retain all historical values and date/hardware context.
+- [x] Review Node 24 support against official runtime and dependency sources; confirm native/transitive installation needs. Present the concrete 22-to-24 compatibility evidence for the baseline decision. Until decided, preserve Node 22 declarations and record alignment as pending.
+- [x] On approval of Node 24, coordinate `.node-version`, package engines, CI, README prerequisites/badge/stack and development instructions. State the tested runtime range accurately; do not treat a lower-bound engine declaration as evidence for all future majors.
+- [x] Resolve compatible stable package/tool versions from official registries/release notes at execution time; inspect Promptfoo config/assertion/output compatibility before selecting an upgrade. Do not equate successful unit tests with successful Promptfoo evaluation.
+- [x] Add bounded ESLint, Prettier and markdownlint-cli2 development dependencies and lock the complete installation. Preserve CommonJS and every existing npm script. Do not remove `js-yaml` simply because its usage needs investigation.
+- [x] Use `npm ci` in a fresh checkout on the selected runtime; rerun the 16 existing tests and check Promptfoo CLI startup/config references without paid or implicit model requests. Update README install to `npm ci` only with that evidence.
+- [x] If evaluation dependencies/runtime change, run both local suites when their models are available and verify result JSON consumption by baseline/compare. Save new runs under distinct names. If unavailable, document exact skipped integrations and leave compatibility/completion claims pending; never relabel old benchmark results as new evidence.
+- [x] Reconcile current Promptfoo badge/stack with the selected manifest/lock. Do not infer or rewrite the tool version used for the historical benchmark; retain all historical values and date/hardware context.
 
 ## Task 4: Add staged and full-repository quality gates
 
 **Files:** New lint/format/Markdown/pre-commit configuration, package scripts and development instructions. Existing JavaScript may receive reviewed formatting-only changes.
 
-- [ ] Configure ESLint for Node/CommonJS and existing test/CLI globals. Configure Prettier conservatively for JavaScript and new tool config; avoid overlapping Markdown formatters. Exclude prompt text, evaluation data/config YAML, outputs, lockfiles and dependencies from automatic formatting.
-- [ ] Add `.markdownlint-cli2.jsonc` using default rules with MD013 disabled. Explicitly cover root/agent/current-guide Markdown; exclude dependencies/generated output and label `docs/superpowers/` as historical. Keep heading, fence, spacing and image-alt rules enabled.
-- [ ] Expose `npm run lint:js`, `npm run format:check`, `npm run lint:md` and aggregate `npm run lint`; document each scope. Establish generic text/syntax checking via pinned pre-commit hooks so CI can run the same checks for all tracked files.
-- [ ] Configure one hook manager: default `pre-commit`. Node hooks use lockfile-installed tools and staged filenames; full unit/model tests stay out of commit hooks. Document `pre-commit install` and `pre-commit run --all-files` with setup prerequisites.
-- [ ] Check trailing whitespace, EOF, merge markers and YAML/JSON with real-format-aware filters. Preserve intentional Markdown hard breaks, YAML scalars, multilingual data and prompt content. Treat `.markdownlint-cli2.jsonc` as JSONC, not strict JSON.
-- [ ] Demonstrate each gate rejecting a representative invalid file in a disposable checkout, then passing after correction. Include Markdown, JS, strict JSON, YAML, merge markers and whitespace. For any added custom helper, add focused behavioral tests before implementation; avoid a bespoke validator when existing tools suffice.
-- [ ] Probe real commits with a partially staged JS/doc edit and an unstaged invalid hunk, plus deletion and generated-file exclusions. Verify staged content is checked, unrelated work is not staged and the index/worktree are restored exactly. Never bypass a failed hook.
-- [ ] Run all maintained-file gates plus `npm test`; compare protected input hashes and parsed config/test data against Task 1. Expected: unchanged prompts/data/scoring and all 16 existing tests passing. Any required non-format behavior fix is a separate, explicitly reviewed scope decision.
+- [x] Configure ESLint for Node/CommonJS and existing test/CLI globals. Configure Prettier conservatively for JavaScript and new tool config; avoid overlapping Markdown formatters. Exclude prompt text, evaluation data/config YAML, outputs, lockfiles and dependencies from automatic formatting.
+- [x] Add `.markdownlint-cli2.jsonc` using default rules with MD013 disabled. Explicitly cover root/agent/current-guide Markdown; exclude dependencies/generated output and label `docs/superpowers/` as historical. Keep heading, fence, spacing and image-alt rules enabled.
+- [x] Expose `npm run lint:js`, `npm run format:check`, `npm run lint:md` and aggregate `npm run lint`; document each scope. Establish generic text/syntax checking via pinned pre-commit hooks so CI can run the same checks for all tracked files.
+- [x] Configure one hook manager: default `pre-commit`. Node hooks use lockfile-installed tools and staged filenames; full unit/model tests stay out of commit hooks. Document `pre-commit install` and `pre-commit run --all-files` with setup prerequisites.
+- [x] Check trailing whitespace, EOF, merge markers and YAML/JSON with real-format-aware filters. Preserve intentional Markdown hard breaks, YAML scalars, multilingual data and prompt content. Treat `.markdownlint-cli2.jsonc` as JSONC, not strict JSON.
+- [x] Demonstrate each gate rejecting a representative invalid file in a disposable checkout, then passing after correction. Include Markdown, JS, strict JSON, YAML, merge markers and whitespace. For any added custom helper, add focused behavioral tests before implementation; avoid a bespoke validator when existing tools suffice.
+- [x] Probe real commits with a partially staged JS/doc edit and an unstaged invalid hunk, plus deletion and generated-file exclusions. Verify staged content is checked, unrelated work is not staged and the index/worktree are restored exactly. Never bypass a failed hook.
+- [x] Run all maintained-file gates plus `npm test`; compare protected input hashes and parsed config/test data against Task 1. Expected: unchanged prompts/data/scoring and all 16 existing tests passing. Any required non-format behavior fix is a separate, explicitly reviewed scope decision.
 
 ## Task 5: Harden CI and prepare a reviewable handoff
 
 **Files:** `.github/workflows/tests.yml`, `.github/dependabot.yml`, `docs/development.md`; conditional verified report assets/links.
 
-- [ ] Retain push/PR offline testing and existing test coverage. Use full verified action SHAs, `permissions: contents: read`, `persist-credentials: false`, job timeouts, lockfile-aware npm caching and `npm ci`. Pin/install the same pre-commit version used locally for full-file gates.
-- [ ] Run the documented JS lint, format, Markdown, text/syntax and unit commands in CI with identical rules/exclusions. Do not add TypeScript/build steps to a CommonJS evaluation project or automatic model/cloud/publish jobs. Preserve secret-free PR operation.
-- [ ] Add weekly npm and `github-actions` dependency PRs, with no automatic major merges. Keep artifacts at 1–3 days if uploaded and ensure no keys/local model output are accidentally included.
-- [ ] Read current repository description/topics, branch enforcement, security settings and available check names through the connected GitHub tools. Prepare any necessary proposals with exact values; do not change settings or metadata as a side effect. Record inaccessible settings as unknown.
-- [ ] From a clean checkout, run `npm ci`, `npm run lint`, `npm test` and `pre-commit run --all-files`. Inspect documented CLI/help and file references; distinguish synthetic/fixture checks from actual local-model runs. Record versions, command outcomes, failures and skips in development.
-- [ ] Repeat the complete preservation reconciliation and inspect the rendered README/customization guide. Verify every old table value, command, provider/regex example and caveat remains available at its recorded location; review the entire branch diff for changed model inputs or lost information.
-- [ ] Prepare a PR summary with documentation impact, dependency/runtime decisions, hook behavior, offline evidence, live evidence/skips and pending settings. Open/push only when execution is authorized; do not merge. Check hosted results at the exact PR head rather than reusing old-head success.
+- [x] Retain push/PR offline testing and existing test coverage. Use full verified action SHAs, `permissions: contents: read`, `persist-credentials: false`, job timeouts, lockfile-aware npm caching and `npm ci`. Pin/install the same pre-commit version used locally for full-file gates.
+- [x] Run the documented JS lint, format, Markdown, text/syntax and unit commands in CI with identical rules/exclusions. Do not add TypeScript/build steps to a CommonJS evaluation project or automatic model/cloud/publish jobs. Preserve secret-free PR operation.
+- [x] Add weekly npm and `github-actions` dependency PRs, with no automatic major merges. Keep artifacts at 1–3 days if uploaded and ensure no keys/local model output are accidentally included.
+- [x] Read current repository description/topics, branch enforcement, security settings and available check names through the connected GitHub tools. Prepare any necessary proposals with exact values; do not change settings or metadata as a side effect. Record inaccessible settings as unknown.
+- [x] From a clean checkout, run `npm ci`, `npm run lint`, `npm test` and `pre-commit run --all-files`. Inspect documented CLI/help and file references; distinguish synthetic/fixture checks from actual local-model runs. Record versions, command outcomes, failures and skips in development.
+- [x] Repeat the complete preservation reconciliation and inspect the rendered README/customization guide. Verify every old table value, command, provider/regex example and caveat remains available at its recorded location; review the entire branch diff for changed model inputs or lost information.
+- [x] Prepare a PR summary with documentation impact, dependency/runtime decisions, hook behavior, offline evidence, live evidence/skips and pending settings. Open/push only when execution is authorized; do not merge. Check hosted results at the exact PR head rather than reusing old-head success.
 
 ## Acceptance and handoff
 
-- [ ] Every preservation row is reconciled, and the full prose/example diff has no unexplained loss. README results and engineering detail remain visible on the landing page.
-- [ ] Three useful maintained guides are indexed; customizing stays authoritative; the profile and standards SHA are recorded in AGENTS.
-- [ ] Protected evaluation inputs and existing npm interfaces retain their behavior; offline checks and staged probes pass.
-- [ ] Runtime/dependency decisions have compatibility evidence; unavailable integrations/settings are clearly pending. No unsupported full-adoption claim.
-- [ ] The final review distinguishes local verification, hosted verification, live model execution and owner decisions.
+- [x] Every preservation row is reconciled, and the full prose/example diff has no unexplained loss. README results and engineering detail remain visible on the landing page.
+- [x] Three useful maintained guides are indexed; customizing stays authoritative; the profile and standards SHA are recorded in AGENTS.
+- [x] Protected evaluation inputs and existing npm interfaces retain their behavior; offline checks and staged probes pass.
+- [x] Runtime/dependency decisions have compatibility evidence; unavailable integrations/settings are clearly pending. No unsupported full-adoption claim.
+- [x] The final review distinguishes local verification, hosted verification, live model execution and owner decisions.
 
-**Planning-only verification:** Inspected the tracked layout, both complete baseline docs, relevant policy guides, package/lock declarations, workflow, scoring/helpers and prompt/story references. Existing `npm test` passed 16/16 on Node 26. No dependency install, model evaluation, hook setup, external setting mutation or implementation was performed. Only this proposed plan was added.
+**Original planning-only verification (before implementation):** Inspected the tracked layout, both complete baseline docs, relevant policy guides, package/lock declarations, workflow, scoring/helpers and prompt/story references. Existing `npm test` passed 16/16 on Node 26. No dependency install, model evaluation, hook setup, external setting mutation or implementation was performed. Only this proposed plan was added.
+
+**Execution handoff (2026-10-31):** Draft [PR #5](https://github.com/yashwant-das/ai-js-promptfoo-eval/pull/5) contains the implementation. Node 22/24 clean checks and all 12 staged probes pass. Translation passed 135/135; test design completed with 11/20 passes, 9 assertion failures and no execution errors. Model-score differences and 16 affected audit packages (5 high) remain for owner review. No merge, paid evaluation or repository setting change.
