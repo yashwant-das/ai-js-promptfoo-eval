@@ -115,10 +115,19 @@ Both complete local suites ran on Node 24.22.1 with Promptfoo 0.125.1, unchanged
 
 The saved 2026-10-19 run contains 14/20 passing cases. Comparing against that run flags pass-rate/metric drops beyond the default five-point baseline tolerance. The baseline command correctly exits 1 for these drops; a same-file baseline roundtrip passes. `compare` consumes the fresh output and reports changed cases. These observations do not isolate dependency effects from generation/grading variability; review the raw outputs before accepting an upgrade baseline. No baseline was automatically accepted, and no benchmark was rewritten. Owner review of the new scores remains pending.
 
-The report screenshot in the README comes from the saved **2026-10-19** run (Promptfoo 0.123.1), imported into an isolated 0.125.1 viewer database. It shows only the two Qwen 3.8 prompt columns and is explicitly separate from both the September benchmark and fresh verification. The screenshot is the committed preview; the raw results and viewer database were not uploaded, and `npm run publish` was not run.
+### Latest report previews (2026-10-31)
+
+The README previews come from the owner's later `npm run eval:test-design` and `npm run eval` exports, loaded into an isolated Promptfoo 0.125.1 viewer database. They are separate from the earlier standards-verification runs above and the September benchmark.
+
+| Export | Run start (UTC) | Result | Preview |
+| --- | --- | --- | --- |
+| `outputs/test-design-results.json` | 2026-10-31 14:39:48 | 12/20 passed, 8 assertion failures, 0 errors; 5 cached generation results | Pass-rate, score-distribution and prompt-comparison graphs plus all four model/prompt columns |
+| `outputs/results.json` | 2026-10-31 14:51:48 | 135/135 passed, 0 failures, 0 errors | All three prompt columns and multilingual output examples |
+
+Promptfoo suppresses charts when every score is the same binary edge value, so the translation preview deliberately uses the results table. Screenshots were captured from the actual viewer and visually inspected; no scores, prompts or evaluation data were modified. The October 19 screenshot is superseded by these two previews. Historical benchmark tables and interpretation text remain unchanged. Only the previews are committed; raw exports and the isolated viewer database stay local. No evaluation rerun or `npm run publish` was needed.
 
 ### Hosted verification and remaining review
 
 At implementation head `2807b9e944a32834a3fffff45952f8e9c1dd590a`, both hosted checks passed: Node 24 quality/unit (37s) and Node 22 compatibility (28s). Later evidence/documentation commits require their own head checks; previous-head success does not satisfy that gate.
 
-[Draft PR #5](https://github.com/yashwant-das/ai-js-promptfoo-eval/pull/5) remains for owner review of score differences, outstanding audit findings and settings proposals. Cloud-provider calls, publishing, merge and metadata/settings changes were not performed. Full compliance and unchanged model quality are not claimed.
+[PR #5](https://github.com/yashwant-das/ai-js-promptfoo-eval/pull/5) was merged on 2026-10-31 as `3db61d0a9de93f0c895f87a36404933f622c74c7` after owner approval. Score differences, outstanding audit findings and settings proposals remain documented follow-ups. Cloud-provider calls, Promptfoo publishing and metadata/settings changes were not performed. Full compliance and unchanged model quality are not claimed.
