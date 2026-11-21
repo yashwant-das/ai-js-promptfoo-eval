@@ -38,12 +38,12 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "eslint": "10.14.0",
-    "globals": "17.13.0",
+    "eslint": "10.15.0",
+    "globals": "17.14.0",
     "js-yaml": "5.5.0",
-    "markdownlint-cli2": "0.24.0",
-    "prettier": "3.9.10",
-    "promptfoo": "0.125.1"
+    "markdownlint-cli2": "0.24.1",
+    "prettier": "3.10.1",
+    "promptfoo": "0.126.0"
   },
   "overrides": {
     "markdownlint": {
